@@ -87,9 +87,10 @@ run_sql_file <- function(conn, path) {
 #'     \item `"All"` to extract all indicators.
 #'     \item A numeric vector such as `c(1, 2, 3)`.
 #'     \item A character vector such as `c("1", "2", "3")`.
+#'     \item A single comma-separated character string, such as
+#'       `"1, 2, 3"`.
 #'   }
 #'
-#'   Comma-separated strings such as `"1, 2, 3"` are not accepted.
 #'   `"All"` must be supplied on its own. Defaults to `NULL`.
 #'
 #' @return A data frame containing the records returned by the SQL query.
@@ -131,6 +132,13 @@ run_sql_file <- function(conn, path) {
 #'     execution.
 #' }
 #'
+#' @section Internal dependencies:
+#' This function depends on:
+#'
+#' \itemize{
+#'   \item `normalize_indicator_ids()` - normalises the supplied indicator IDs
+#'     and identifies requests to extract all indicators.
+#' }
 #' @export
 get_indicators_from_sql <- function(conn,
                                     schema_name,
@@ -138,101 +146,71 @@ get_indicators_from_sql <- function(conn,
                                     database_name = NULL,
                                     indicator_ids = NULL){
   
-      
-      # Validate indicator IDs 
-      valid_type <- is.character(indicator_ids) || is.numeric(indicator_ids) # must be either numeric or character
-      
-      if(!is.null(indicator_ids) && !valid_type){
-        stop(
-          "`indicator_ids` must be NULL, \"All\", or a numeric/character vector."
-        )
-      }
-      
-      if (is.character(indicator_ids) && any(grepl(",", indicator_ids))) { # don't accept this format: "1, 2, 3"
-        stop(
-          "`indicator_ids` must be supplied as a vector, for example ",
-          "c(\"1\", \"2\", \"3\"), not as a single comma-separated string."
-        )
-      }
-      
-      if (length(indicator_ids) > 1 && any(tolower(as.character(indicator_ids)) == "all")) { # don't accept this format: c("All", "1")
-        stop(
-          "`All` must be supplied on its own."
-        )
-      }
-    
+  # Normalize indicator IDs
+  ids <- normalize_indicator_ids(indicator_ids)
   
-      tryCatch(
-        { 
-          # Create table identifier
-          if(is.null(database_name)){
-            
-            table_id <- DBI::Id(
-              schema = schema_name,
-              table = table_name
-            )
-          } else{
-            
-            table_id <- DBI::Id(
-              catalog = database_name,
-              schema = schema_name,
-              table = table_name
-            )
-          }
-          
-          quoted_table <- DBI::dbQuoteIdentifier(
-            conn, table_id
-          )
-          
-          # Create a base query
-          sql_query <- paste0("SELECT * FROM ", quoted_table)
-          
-          # Get ALL indicators if the following conditions are met
-          get_all <- is.null(indicator_ids) || # If no IDs are provided, get all indicators by default
-            (
-              length(indicator_ids) == 1 &&
-                is.character(indicator_ids) &&
-                tolower(indicator_ids) == "all" # Or the supplied input is "All"
-            )
-          
-          if (!get_all) {
-            # Quote each literal safely to handle numbers/strings
-            quoted_ids <- vapply(
-              indicator_ids,
-              function(x) {
-                as.character(
-                  DBI::dbQuoteLiteral(conn, x)
-                )
-              },
-              character(1)
-            )
-            
-            # Build the WHERE clause when indicator IDs are provided
-            sql_query <- paste0(sql_query, " WHERE indicator_id IN (",
-                                paste(quoted_ids, collapse = ", "),")")
-          }
-          
-          # Run the query
-          result <- DBI::dbGetQuery(conn, sql_query)
-          
-          message("\u2705 Indicators successfully extracted from SQL.")
-          
-          message("Total rows extracted: ",nrow(result))
-          
-          result
-        },
-        error = function(e) {
-          stop(
-            "\u274C Failed to extract indicators from SQL table ",
-            table_name,
-            " - ",
-            conditionMessage(e),
-            call. = FALSE
-          )
-        }
+  tryCatch(
+    { 
+      # Create table identifier
+      if(is.null(database_name)){
+        
+        table_id <- DBI::Id(
+          schema = schema_name,
+          table = table_name
         )
+      } else{
+        
+        table_id <- DBI::Id(
+          catalog = database_name,
+          schema = schema_name,
+          table = table_name
+        )
+      }
+      
+      quoted_table <- DBI::dbQuoteIdentifier(
+        conn, table_id
+      )
+      
+      # Create a base query
+      sql_query <- paste0("SELECT * FROM ", quoted_table)
+      
+      # Build WHERE clause when indicator IDs are provided
+      if (!is.null(ids) && length(ids) > 0) {
+        
+        quoted_ids <- vapply(
+          ids,
+          function(x) {
+            as.character(
+              DBI::dbQuoteLiteral(conn, x)
+            )
+          },
+          character(1)
+        )
+        
+        sql_query <- paste0(sql_query, " WHERE indicator_id IN (",
+                            paste(quoted_ids, collapse = ", "),")")
+      }
+      
+      # Run the query
+      result <- DBI::dbGetQuery(conn, sql_query)
+      
+      message("\u2705 Indicators successfully extracted from SQL.")
+      
+      message("Total rows extracted: ",nrow(result))
+      
+      result
+    },
+    error = function(e) {
+      stop(
+        "\u274C Failed to extract indicators from SQL table ",
+        table_name,
+        " - ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
+  )
 }
-
 
 #' Replace indicator data in a SQL table
 #'
