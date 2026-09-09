@@ -334,11 +334,18 @@ replace_indicator_data_in_sql <- function(conn,
   tryCatch(
     {
       # Create and safely quote table/column identifiers
-      tbl_id <- DBI::Id(
-        catalog = database_name,
-        schema = schema_name,
-        table = table_name
-      )
+      if (startsWith(table_name, "#")) {
+        
+        tbl_id <- table_name
+        
+      } else{
+        # Create and safely quote table/column identifiers
+        tbl_id <- DBI::Id(
+          catalog = database_name,
+          schema = schema_name,
+          table = table_name
+        )
+      }
       
       tbl_sql <- DBI::dbQuoteIdentifier(conn, tbl_id)
       col_sql <- DBI::dbQuoteIdentifier(conn, id_column)
@@ -408,7 +415,7 @@ replace_indicator_data_in_sql <- function(conn,
     error = function(e) {
       stop(
         "\u274C Failed to insert data into SQL table ",
-        table,
+        table_name,
         " - ",
         conditionMessage(e),
         call. = FALSE
