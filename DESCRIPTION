@@ -1,0 +1,24 @@
+Package: metricengineR
+Title: Reusable Functions for Metric Engine Pipelines
+Version: 0.0.0.9000
+Authors@R: 
+    person("Siti", "Hassan", , "siti.hassan@nhs.net", role = c("aut", "cre"))
+Description: Provides reusable functions for metric engine workflows, including
+    database extraction and loading, indicator processing, data standardisation,
+    calculation helpers, output tidying, and supporting transformations used
+    across analytical frameworks such as oversight, outcomes, and health
+    inequalities reporting.
+License: MIT + file LICENSE
+Depends:
+    R (>= 4.1.0)
+Imports: 
+    DBI,
+    dplyr,
+    rlang
+Suggests: 
+    odbc,
+    RSQLite,
+    testthat
+Config/roxygen2/version: 8.1.0
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
