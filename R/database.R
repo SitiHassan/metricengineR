@@ -136,7 +136,7 @@ run_sql_file <- function(conn, path) {
 #' This function depends on:
 #'
 #' \itemize{
-#'   \item `normalize_indicator_ids()` - normalises the supplied indicator IDs
+#'   \item `normalise_indicator_ids()` - normalises the supplied indicator IDs
 #'     and identifies requests to extract all indicators.
 #' }
 #' @export
@@ -146,8 +146,8 @@ get_indicators_from_sql <- function(conn,
                                     database_name = NULL,
                                     indicator_ids = NULL){
   
-  # Normalize indicator IDs
-  ids <- normalize_indicator_ids(indicator_ids)
+  # normalise indicator IDs
+  ids <- normalise_indicator_ids(indicator_ids)
   
   tryCatch(
     { 
@@ -249,7 +249,7 @@ get_indicators_from_sql <- function(conn,
 #'
 #' @details
 #' The supplied `indicator_ids` are first processed using
-#' `normalize_indicator_ids()`.
+#' `normalise_indicator_ids()`.
 #'
 #' The target table and indicator ID column are represented using
 #' `DBI::Id()` and safely quoted using `DBI::dbQuoteIdentifier()`.
@@ -258,7 +258,7 @@ get_indicators_from_sql <- function(conn,
 #' `DELETE` statement containing a `WHERE` clause for those IDs. Indicator
 #' values are safely quoted using `DBI::dbQuoteLiteral()`.
 #'
-#' If `"All"` is supplied and `normalize_indicator_ids()` returns `NULL`,
+#' If `"All"` is supplied and `normalise_indicator_ids()` returns `NULL`,
 #' no `WHERE` clause is added and all existing rows in the target table are
 #' deleted.
 #'
@@ -277,7 +277,7 @@ get_indicators_from_sql <- function(conn,
 #' This function depends on:
 #'
 #' \itemize{
-#'   \item `normalize_indicator_ids()` - standardises the supplied indicator
+#'   \item `normalise_indicator_ids()` - standardises the supplied indicator
 #'     ID input
 #' }
 #'
@@ -306,8 +306,8 @@ replace_indicator_data_in_sql <- function(conn,
                                           indicator_ids = "All",
                                           id_column = "indicator_id") {
   
-  # Normalize indicator IDs
-  ids <- normalize_indicator_ids(indicator_ids)
+  # normalise indicator IDs
+  ids <- normalise_indicator_ids(indicator_ids)
   
   tryCatch(
     {
