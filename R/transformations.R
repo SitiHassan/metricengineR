@@ -237,24 +237,24 @@ clean_data_types <- function(data){
   
   data |>
     dplyr::mutate(
-      indicator_id     = as.integer(indicator_id),
-      start_date       = as.Date(start_date),
-      end_date         = as.Date(end_date),
-      numerator        = as.numeric(numerator),
-      denominator      = as.numeric(denominator),
-      indicator_value  = as.numeric(indicator_value),
-      lower_ci95       = as.numeric(lower_ci95),
-      upper_ci95       = as.numeric(upper_ci95),
-      imd_code         = as.integer(imd_code),
-      aggregation_id   = as.integer(aggregation_id),
-      age_group_code   = as.integer(age_group_code),
-      sex_code         = as.integer(sex_code),
-      ethnicity_code   = as.integer(ethnicity_code),
-      creation_date    = as.POSIXct(creation_date),
-      value_type_code  = as.integer(value_type_code),
-      source_code      = as.integer(source_code),
-      time_period_type = as.character(time_period_type),
-      combination_id   = as.integer(combination_id)
+      indicator_id     = as.integer(.data$indicator_id),
+      start_date       = as.Date(.data$start_date),
+      end_date         = as.Date(.data$end_date),
+      numerator        = as.numeric(.data$numerator),
+      denominator      = as.numeric(.data$denominator),
+      indicator_value  = as.numeric(.data$indicator_value),
+      lower_ci95       = as.numeric(.data$lower_ci95),
+      upper_ci95       = as.numeric(.data$upper_ci95),
+      imd_code         = as.integer(.data$imd_code),
+      aggregation_id   = as.integer(.data$aggregation_id),
+      age_group_code   = as.integer(.data$age_group_code),
+      sex_code         = as.integer(.data$sex_code),
+      ethnicity_code   = as.integer(.data$ethnicity_code),
+      creation_date    = as.POSIXct(.data$creation_date),
+      value_type_code  = as.integer(.data$value_type_code),
+      source_code      = as.integer(.data$source_code),
+      time_period_type = as.character(.data$time_period_type),
+      combination_id   = as.integer(.data$combination_id)
     )
 }
 
