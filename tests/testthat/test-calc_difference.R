@@ -23,8 +23,8 @@ testthat::test_that("calc_difference calculates the correct difference", {
   )
 })
 
-# Test that it only keeps the selected value type codes
-testthat::test_that("calc_difference filters to selected value type code", {
+# Test that it only keeps the difference value type codes
+testthat::test_that("calc_difference filters to value type codes 10 and 11", {
   
   df <- data.frame(
     value_type_code = c(10L, 11L, 12L),
