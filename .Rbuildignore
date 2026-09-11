@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^dev$
 ^LICENSE\.md$
+^diagrams$
+^notes\.txt$
+^pipeline_script_notes\.txt$
