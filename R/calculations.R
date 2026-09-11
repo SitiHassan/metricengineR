@@ -116,7 +116,11 @@ calc_percentage_change <- function(df,
     )
   }
   
-  if(!is.logical(confidence_intervals_required) || length(confidence_intervals_required) != 1){
+  if(!is.logical(confidence_intervals_required) || 
+     length(confidence_intervals_required) != 1 || 
+    is.na(confidence_intervals_required) # Since NA is logical and has length 1, it needs to be explicitly excluded
+    ){
+    
     stop(
       "`confidence_intervals_required` must be TRUE or FALSE.",
       call. = FALSE
