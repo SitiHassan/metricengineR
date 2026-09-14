@@ -1,5 +1,5 @@
 # Test the calculation 
-testthat::test_that("calc_percentage_change calculates the correct change", {
+testthat::test_that("calculate_percentage_change calculates the correct change", {
   
   df <- data.frame(
     value_type_code = c(9L, 9L),
@@ -8,7 +8,7 @@ testthat::test_that("calc_percentage_change calculates the correct change", {
     value_multiplier = 100
   )
   
-  result <- calc_percentage_change(df)
+  result <- calculate_percentage_change(df)
   
   expect_equal(
     result$value,
@@ -25,7 +25,7 @@ testthat::test_that("calc_percentage_change calculates the correct change", {
 })
 
 # Test it returns NA when old value is 0 or NA
-testthat::test_that("calc_percentage_change returns NA when old value is zero or missing", {
+testthat::test_that("calculate_percentage_change returns NA when old value is zero or missing", {
   
   df <- data.frame(
     value_type_code = c(9L, 9L),
@@ -34,7 +34,7 @@ testthat::test_that("calc_percentage_change returns NA when old value is zero or
     value_multiplier = 100
   )
   
-  result <- calc_percentage_change(df)
+  result <- calculate_percentage_change(df)
   
   expect_true(
     all(is.na(result$value))
@@ -43,7 +43,7 @@ testthat::test_that("calc_percentage_change returns NA when old value is zero or
 })
 
 # Test it applies different value multiplier
-testthat::test_that("calc_percentage_change applies the value multiplier", {
+testthat::test_that("calculate_percentage_change applies the value multiplier", {
   
   df <- data.frame(
     value_type_code = 9L,
@@ -52,7 +52,7 @@ testthat::test_that("calc_percentage_change applies the value multiplier", {
     value_multiplier = 1
   )
   
-  result <- calc_percentage_change(df)
+  result <- calculate_percentage_change(df)
   
   expect_equal(
     result$value,
@@ -61,7 +61,7 @@ testthat::test_that("calc_percentage_change applies the value multiplier", {
 })
 
 # Test what happens when there are no value type 9 rows
-testthat::test_that("calc_percentage_change returns zero rows when value type 9 is absent", {
+testthat::test_that("calculate_percentage_change returns zero rows when value type 9 is absent", {
   
   df <- data.frame(
     value_type_code = c(10L, 11L),
@@ -70,7 +70,7 @@ testthat::test_that("calc_percentage_change returns zero rows when value type 9 
     value_multiplier = 100
   )
   
-  result <- calc_percentage_change(df)
+  result <- calculate_percentage_change(df)
   
   expect_equal(
     nrow(result),
@@ -79,7 +79,7 @@ testthat::test_that("calc_percentage_change returns zero rows when value type 9 
 })
 
 # Test that it only keeps the selected value type codes
-testthat::test_that("calc_percentage_change filters to value type code 9", {
+testthat::test_that("calculate_percentage_change filters to value type code 9", {
   
   df <- data.frame(
     value_type_code = c(10L, 11L, 9L),
@@ -88,7 +88,7 @@ testthat::test_that("calc_percentage_change filters to value type code 9", {
     value_multiplier = 100L
   )
   
-  result <- calc_percentage_change(df)
+  result <- calculate_percentage_change(df)
   
   expect_equal(
     nrow(result),
@@ -102,7 +102,7 @@ testthat::test_that("calc_percentage_change filters to value type code 9", {
 })
 
 # Test custom columns 
-testthat::test_that("calc_percentage_change works with custom column names", {
+testthat::test_that("calculate_percentage_change works with custom column names", {
   
   df <- data.frame(
     type_code = c(9L, 9L),
@@ -111,7 +111,7 @@ testthat::test_that("calc_percentage_change works with custom column names", {
     multiplier = 100L
   )
   
-  result <- calc_percentage_change(
+  result <- calculate_percentage_change(
     df,
     value_type_code_col = "type_code",
     new_value_col = "current_value",
@@ -137,15 +137,15 @@ testthat::test_that("calc_percentage_change works with custom column names", {
 })
 
 # Test invalid input
-testthat::test_that("calc_percentage_change rejects non-data-frame input", {
+testthat::test_that("calculate_percentage_change rejects non-data-frame input", {
   
   expect_error(
-    calc_percentage_change(c(1, 2, 3)),
+    calculate_percentage_change(c(1, 2, 3)),
     "`df` must be a data frame"
   )
 })
 
-testthat::test_that("calc_percentage_change rejects non-logical or invalid confidence intervals required input", {
+testthat::test_that("calculate_percentage_change rejects non-logical or invalid confidence intervals required input", {
   
   df <- data.frame(
     value_type_code = c(9L, 9L),
@@ -155,7 +155,7 @@ testthat::test_that("calc_percentage_change rejects non-logical or invalid confi
   )
   
   expect_error(
-    calc_percentage_change(
+    calculate_percentage_change(
       df, 
       confidence_intervals_required = "FALSE"
       ),
@@ -163,7 +163,7 @@ testthat::test_that("calc_percentage_change rejects non-logical or invalid confi
   )
   
   expect_error(
-    calc_percentage_change(
+    calculate_percentage_change(
       df,
       confidence_intervals_required = c(FALSE, TRUE)
       ),
@@ -171,7 +171,7 @@ testthat::test_that("calc_percentage_change rejects non-logical or invalid confi
   )
   
   expect_error(
-    calc_percentage_change(
+    calculate_percentage_change(
       df,
       confidence_intervals_required = NA
       ),
@@ -180,7 +180,7 @@ testthat::test_that("calc_percentage_change rejects non-logical or invalid confi
 })
 
 # Test it stops when confidence intervals are required
-testthat::test_that("calc_percentage_change stops when confidence intervals are required", {
+testthat::test_that("calculate_percentage_change stops when confidence intervals are required", {
   
   df <- data.frame(
     value_type_code = c(9L, 9L),
@@ -190,14 +190,14 @@ testthat::test_that("calc_percentage_change stops when confidence intervals are 
   )
   
   expect_error(
-    calc_percentage_change(df, confidence_intervals_required = TRUE),
+    calculate_percentage_change(df, confidence_intervals_required = TRUE),
     "Confidence intervals for percentage change have not yet been implemented."
   )
   
 })
 
 # Test missing columns
-testthat::test_that("calc_percentage_change errors when required columns are missing", {
+testthat::test_that("calculate_percentage_change errors when required columns are missing", {
   
   df <- data.frame(
     value_type_code = c(9L, 9L),
@@ -205,7 +205,7 @@ testthat::test_that("calc_percentage_change errors when required columns are mis
   )
   
   expect_error(
-    calc_percentage_change(df),
+    calculate_percentage_change(df),
     "Missing required columns: denominator, value_multiplier"
   )
 })

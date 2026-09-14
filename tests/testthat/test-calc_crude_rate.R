@@ -1,6 +1,6 @@
 # Test 1: Basic crude rate calculation without confidence intervals
 # Checks that eligible rows calculate correctly and CIs remain NA.
-testthat::test_that("calc_crude_rate calculates crude rates without confidence intervals", {
+testthat::test_that("calculate_crude_rate calculates crude rates without confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(3L, 3L),
@@ -9,7 +9,7 @@ testthat::test_that("calc_crude_rate calculates crude rates without confidence i
     value_multiplier = c(100000, 100000)
   )
   
-  result <- calc_crude_rate(df)
+  result <- calculate_crude_rate(df)
   
   testthat::expect_equal(
     result$value,
@@ -28,7 +28,7 @@ testthat::test_that("calc_crude_rate calculates crude rates without confidence i
 
 # Test 2: Only crude rate rows are returned
 # Checks that other value types are excluded.
-testthat::test_that("calc_crude_rate filters to crude rate value type", {
+testthat::test_that("calculate_crude_rate filters to crude rate value type", {
   
   df <- data.frame(
     value_type_code = c(3L, 2L, 1L, 3L),
@@ -37,7 +37,7 @@ testthat::test_that("calc_crude_rate filters to crude rate value type", {
     value_multiplier = c(100000, 100, 1, 100000)
   )
   
-  result <- calc_crude_rate(df)
+  result <- calculate_crude_rate(df)
   
   testthat::expect_equal(
     nrow(result),
@@ -53,7 +53,7 @@ testthat::test_that("calc_crude_rate filters to crude rate value type", {
 # Test 3: Ineligible rows are retained with NA values
 # Checks missing numerator, zero denominator, missing denominator,
 # and missing value multiplier.
-testthat::test_that("calc_crude_rate retains ineligible rows with NA values", {
+testthat::test_that("calculate_crude_rate retains ineligible rows with NA values", {
   
   df <- data.frame(
     value_type_code = c(3L, 3L, 3L, 3L, 3L),
@@ -62,7 +62,7 @@ testthat::test_that("calc_crude_rate retains ineligible rows with NA values", {
     value_multiplier = c(100000, 100000, 100000, 100000, NA)
   )
   
-  result <- calc_crude_rate(df)
+  result <- calculate_crude_rate(df)
   
   testthat::expect_equal(
     nrow(result),
@@ -82,7 +82,7 @@ testthat::test_that("calc_crude_rate retains ineligible rows with NA values", {
 
 # Test 4: Negative numerators are rejected
 # Crude-rate numerators represent event counts and cannot be negative.
-testthat::test_that("calc_crude_rate rejects negative numerators", {
+testthat::test_that("calculate_crude_rate rejects negative numerators", {
   
   df <- data.frame(
     value_type_code = 3L,
@@ -92,7 +92,7 @@ testthat::test_that("calc_crude_rate rejects negative numerators", {
   )
   
   testthat::expect_error(
-    calc_crude_rate(df),
+    calculate_crude_rate(df),
     "Numerator cannot be negative"
   )
 })
@@ -100,7 +100,7 @@ testthat::test_that("calc_crude_rate rejects negative numerators", {
 
 # Test 5: Custom column names work
 # Checks that the function is not dependent on default column names.
-testthat::test_that("calc_crude_rate works with custom column names", {
+testthat::test_that("calculate_crude_rate works with custom column names", {
   
   df <- data.frame(
     type_code = c(3L, 3L),
@@ -109,7 +109,7 @@ testthat::test_that("calc_crude_rate works with custom column names", {
     multiplier = c(100000, 100000)
   )
   
-  result <- calc_crude_rate(
+  result <- calculate_crude_rate(
     df,
     value_type_code_col = "type_code",
     numerator_col = "events",
@@ -126,7 +126,7 @@ testthat::test_that("calc_crude_rate works with custom column names", {
 
 # Test 6: Confidence intervals are calculated for valid crude rates
 # Checks the phe_rate() branch and confirms CIs are returned.
-testthat::test_that("calc_crude_rate calculates confidence intervals", {
+testthat::test_that("calculate_crude_rate calculates confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(3L, 3L),
@@ -135,7 +135,7 @@ testthat::test_that("calc_crude_rate calculates confidence intervals", {
     value_multiplier = c(100000, 100000)
   )
   
-  result <- calc_crude_rate(
+  result <- calculate_crude_rate(
     df,
     confidence_intervals_required = TRUE
   )
@@ -165,7 +165,7 @@ testthat::test_that("calc_crude_rate calculates confidence intervals", {
 
 # Test 7: Ineligible rows remain NA when confidence intervals are requested
 # Checks that rows with denominator = 0 are retained rather than removed.
-testthat::test_that("calc_crude_rate retains ineligible rows when confidence intervals are required", {
+testthat::test_that("calculate_crude_rate retains ineligible rows when confidence intervals are required", {
   
   df <- data.frame(
     value_type_code = c(3L, 3L),
@@ -174,7 +174,7 @@ testthat::test_that("calc_crude_rate retains ineligible rows when confidence int
     value_multiplier = c(100000, 100000)
   )
   
-  result <- calc_crude_rate(
+  result <- calculate_crude_rate(
     df,
     confidence_intervals_required = TRUE
   )
@@ -204,7 +204,7 @@ testthat::test_that("calc_crude_rate retains ineligible rows when confidence int
 
 # Test 8: Multiple multipliers are rejected when CIs are required
 # phe_rate() uses one multiplier per calculation call.
-testthat::test_that("calc_crude_rate rejects multiple multipliers for confidence intervals", {
+testthat::test_that("calculate_crude_rate rejects multiple multipliers for confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(3L, 3L),
@@ -214,7 +214,7 @@ testthat::test_that("calc_crude_rate rejects multiple multipliers for confidence
   )
   
   testthat::expect_error(
-    calc_crude_rate(
+    calculate_crude_rate(
       df,
       confidence_intervals_required = TRUE
     ),
@@ -225,7 +225,7 @@ testthat::test_that("calc_crude_rate rejects multiple multipliers for confidence
 
 # Test 9: Different multipliers can still be used when CIs are not required
 # Without phe_rate(), each row uses its own multiplier.
-testthat::test_that("calc_crude_rate allows different multipliers without confidence intervals", {
+testthat::test_that("calculate_crude_rate allows different multipliers without confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(3L, 3L),
@@ -234,7 +234,7 @@ testthat::test_that("calc_crude_rate allows different multipliers without confid
     value_multiplier = c(1000, 100000)
   )
   
-  result <- calc_crude_rate(
+  result <- calculate_crude_rate(
     df,
     confidence_intervals_required = FALSE
   )
@@ -247,17 +247,17 @@ testthat::test_that("calc_crude_rate allows different multipliers without confid
 
 
 # Test 10: Non-data-frame inputs are rejected
-testthat::test_that("calc_crude_rate rejects non-data-frame input", {
+testthat::test_that("calculate_crude_rate rejects non-data-frame input", {
   
   testthat::expect_error(
-    calc_crude_rate(c(1, 2, 3)),
+    calculate_crude_rate(c(1, 2, 3)),
     "`df` must be a data frame"
   )
 })
 
 
 # Test 11: Missing required columns are reported
-testthat::test_that("calc_crude_rate errors when required columns are missing", {
+testthat::test_that("calculate_crude_rate errors when required columns are missing", {
   
   df <- data.frame(
     value_type_code = 3L,
@@ -265,14 +265,14 @@ testthat::test_that("calc_crude_rate errors when required columns are missing", 
   )
   
   testthat::expect_error(
-    calc_crude_rate(df),
+    calculate_crude_rate(df),
     "Missing required columns: denominator, value_multiplier"
   )
 })
 
 
 # Test 12: confidence_intervals_required must be one TRUE or FALSE
-testthat::test_that("calc_crude_rate validates confidence_intervals_required", {
+testthat::test_that("calculate_crude_rate validates confidence_intervals_required", {
   
   df <- data.frame(
     value_type_code = 3L,
@@ -282,7 +282,7 @@ testthat::test_that("calc_crude_rate validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_crude_rate(
+    calculate_crude_rate(
       df,
       confidence_intervals_required = "TRUE"
     ),
@@ -290,7 +290,7 @@ testthat::test_that("calc_crude_rate validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_crude_rate(
+    calculate_crude_rate(
       df,
       confidence_intervals_required = c(TRUE, FALSE)
     ),
@@ -298,7 +298,7 @@ testthat::test_that("calc_crude_rate validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_crude_rate(
+    calculate_crude_rate(
       df,
       confidence_intervals_required = NA
     ),
@@ -309,7 +309,7 @@ testthat::test_that("calc_crude_rate validates confidence_intervals_required", {
 
 # Test 13: No eligible rows can still be returned when CIs are requested
 # Checks that phe_rate() is not called when nothing can be calculated.
-testthat::test_that("calc_crude_rate handles no eligible rows with confidence intervals", {
+testthat::test_that("calculate_crude_rate handles no eligible rows with confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(3L, 3L),
@@ -318,7 +318,7 @@ testthat::test_that("calc_crude_rate handles no eligible rows with confidence in
     value_multiplier = c(100000, 100000)
   )
   
-  result <- calc_crude_rate(
+  result <- calculate_crude_rate(
     df,
     confidence_intervals_required = TRUE
   )
@@ -341,7 +341,7 @@ testthat::test_that("calc_crude_rate handles no eligible rows with confidence in
   )
 })
 
-testthat::test_that("calc_crude_rate handles no crude rate rows", {
+testthat::test_that("calculate_crude_rate handles no crude rate rows", {
   
   df <- data.frame(
     value_type_code = c(1L, 2L),
@@ -350,7 +350,7 @@ testthat::test_that("calc_crude_rate handles no crude rate rows", {
     value_multiplier = c(1, 100)
   )
   
-  result <- calc_crude_rate(df)
+  result <- calculate_crude_rate(df)
   
   testthat::expect_equal(nrow(result), 0)
   

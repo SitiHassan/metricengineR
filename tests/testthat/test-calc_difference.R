@@ -1,5 +1,5 @@
 # Test the calculation 
-testthat::test_that("calc_difference calculates the correct difference", {
+testthat::test_that("calculate_difference calculates the correct difference", {
   
   df <- data.frame(
     value_type_code = c(10L, 11L),
@@ -7,7 +7,7 @@ testthat::test_that("calc_difference calculates the correct difference", {
     denominator = c(50, 100)
   )
   
-  result <- calc_difference(df)
+  result <- calculate_difference(df)
   
   expect_equal(
     result$value,
@@ -24,7 +24,7 @@ testthat::test_that("calc_difference calculates the correct difference", {
 })
 
 # Test that it only keeps the difference value type codes
-testthat::test_that("calc_difference filters to value type codes 10 and 11", {
+testthat::test_that("calculate_difference filters to value type codes 10 and 11", {
   
   df <- data.frame(
     value_type_code = c(10L, 11L, 12L),
@@ -32,7 +32,7 @@ testthat::test_that("calc_difference filters to value type codes 10 and 11", {
     denominator = c(50, 100, 150)
   )
   
-  result <- calc_difference(df)
+  result <- calculate_difference(df)
   
   expect_equal(
     nrow(result),
@@ -46,7 +46,7 @@ testthat::test_that("calc_difference filters to value type codes 10 and 11", {
 })
 
 # Test custom columns 
-testthat::test_that("calc_difference works with custom column names", {
+testthat::test_that("calculate_difference works with custom column names", {
   
   df <- data.frame(
     type_code = c(10L, 11L),
@@ -54,7 +54,7 @@ testthat::test_that("calc_difference works with custom column names", {
     national_value = c(75, 70)
   )
   
-  result <- calc_difference(
+  result <- calculate_difference(
     df,
     value_type_code_col = "type_code",
     minuend_col = "local_value",
@@ -76,16 +76,16 @@ testthat::test_that("calc_difference works with custom column names", {
 })
 
 # Test invalid input
-testthat::test_that("calc_difference rejects non-data-frame input", {
+testthat::test_that("calculate_difference rejects non-data-frame input", {
   
   expect_error(
-    calc_difference(c(1, 2, 3)),
+    calculate_difference(c(1, 2, 3)),
     "`df` must be a data frame"
   )
 })
 
 # Test missing columns
-testthat::test_that("calc_difference errors when required columns are missing", {
+testthat::test_that("calculate_difference errors when required columns are missing", {
   
   df <- data.frame(
     value_type_code = c(10L, 11L),
@@ -93,13 +93,13 @@ testthat::test_that("calc_difference errors when required columns are missing", 
   )
   
   expect_error(
-    calc_difference(df),
+    calculate_difference(df),
     "Missing required columns: denominator"
   )
 })
 
 # Test negative-difference 
-testthat::test_that("calc_difference preserves negative differences", {
+testthat::test_that("calculate_difference preserves negative differences", {
   
   df <- data.frame(
     value_type_code = c(10L),
@@ -107,7 +107,7 @@ testthat::test_that("calc_difference preserves negative differences", {
     denominator = 50
   )
   
-  result <- calc_difference(df)
+  result <- calculate_difference(df)
   
   expect_equal(
     result$value,

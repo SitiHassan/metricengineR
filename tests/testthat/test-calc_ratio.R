@@ -1,6 +1,6 @@
 # Test 1: Basic ratio calculation without confidence intervals
 # Checks that eligible rows calculate correctly and CIs remain NA.
-testthat::test_that("calc_ratio calculates ratios without confidence intervals", {
+testthat::test_that("calculate_ratio calculates ratios without confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(7L, 7L),
@@ -9,7 +9,7 @@ testthat::test_that("calc_ratio calculates ratios without confidence intervals",
     value_multiplier = c(1, 1)
   )
   
-  result <- calc_ratio(df)
+  result <- calculate_ratio(df)
   
   testthat::expect_equal(
     result$value,
@@ -28,7 +28,7 @@ testthat::test_that("calc_ratio calculates ratios without confidence intervals",
 
 # Test 2: Only ratio rows are returned
 # Checks that other value types are excluded.
-testthat::test_that("calc_ratio filters to ratio value type", {
+testthat::test_that("calculate_ratio filters to ratio value type", {
   
   df <- data.frame(
     value_type_code = c(7L, 2L, 1L, 7L),
@@ -37,7 +37,7 @@ testthat::test_that("calc_ratio filters to ratio value type", {
     value_multiplier = c(1, 100, 1, 1)
   )
   
-  result <- calc_ratio(df)
+  result <- calculate_ratio(df)
   
   testthat::expect_equal(
     nrow(result),
@@ -53,7 +53,7 @@ testthat::test_that("calc_ratio filters to ratio value type", {
 # Test 3: Ineligible rows are retained with NA values
 # Checks missing numerator, zero denominator, missing denominator,
 # and missing value multiplier.
-testthat::test_that("calc_ratio retains ineligible rows with NA values", {
+testthat::test_that("calculate_ratio retains ineligible rows with NA values", {
   
   df <- data.frame(
     value_type_code = c(7L, 7L, 7L, 7L, 7L),
@@ -62,7 +62,7 @@ testthat::test_that("calc_ratio retains ineligible rows with NA values", {
     value_multiplier = c(1, 1, 1, 1, NA)
   )
   
-  result <- calc_ratio(df)
+  result <- calculate_ratio(df)
   
   testthat::expect_equal(
     nrow(result),
@@ -81,7 +81,7 @@ testthat::test_that("calc_ratio retains ineligible rows with NA values", {
 
 
 # Test 4: Negative numerators/denominators are not rejected
-testthat::test_that("calc_ratio does not reject negative numerators nor negative denominators", {
+testthat::test_that("calculate_ratio does not reject negative numerators nor negative denominators", {
   
   df <- data.frame(
     value_type_code = c(7L, 7L),
@@ -90,7 +90,7 @@ testthat::test_that("calc_ratio does not reject negative numerators nor negative
     value_multiplier = c(1, 1)
   )
   
-  result <- calc_ratio(df)
+  result <- calculate_ratio(df)
   
   testthat::expect_equal(
     result$value,
@@ -102,7 +102,7 @@ testthat::test_that("calc_ratio does not reject negative numerators nor negative
 
 # Test 5: Custom column names work
 # Checks that the function is not dependent on default column names.
-testthat::test_that("calc_ratio works with custom column names", {
+testthat::test_that("calculate_ratio works with custom column names", {
   
   df <- data.frame(
     type_code = c(7L, 7L),
@@ -111,7 +111,7 @@ testthat::test_that("calc_ratio works with custom column names", {
     multiplier = c(1, 1)
   )
   
-  result <- calc_ratio(
+  result <- calculate_ratio(
     df,
     value_type_code_col = "type_code",
     numerator_col = "events",
@@ -128,7 +128,7 @@ testthat::test_that("calc_ratio works with custom column names", {
 
 # Test 6: Confidence intervals are not currently implemented
 # Checks that requesting CIs gives the intended error.
-testthat::test_that("calc_ratio stops when confidence intervals are required", {
+testthat::test_that("calculate_ratio stops when confidence intervals are required", {
   
   df <- data.frame(
     value_type_code = 7L,
@@ -138,7 +138,7 @@ testthat::test_that("calc_ratio stops when confidence intervals are required", {
   )
   
   testthat::expect_error(
-    calc_ratio(
+    calculate_ratio(
       df,
       confidence_intervals_required = TRUE
     ),
@@ -149,17 +149,17 @@ testthat::test_that("calc_ratio stops when confidence intervals are required", {
 
 
 # Test 7: Non-data-frame inputs are rejected
-testthat::test_that("calc_ratio rejects non-data-frame input", {
+testthat::test_that("calculate_ratio rejects non-data-frame input", {
   
   testthat::expect_error(
-    calc_ratio(c(1, 2, 3)),
+    calculate_ratio(c(1, 2, 3)),
     "`df` must be a data frame"
   )
 })
 
 
 # Test 8: Missing required columns are reported
-testthat::test_that("calc_ratio errors when required columns are missing", {
+testthat::test_that("calculate_ratio errors when required columns are missing", {
   
   df <- data.frame(
     value_type_code = 7L,
@@ -167,14 +167,14 @@ testthat::test_that("calc_ratio errors when required columns are missing", {
   )
   
   testthat::expect_error(
-    calc_ratio(df),
+    calculate_ratio(df),
     "Missing required columns: denominator, value_multiplier"
   )
 })
 
 
 # Test 9: confidence_intervals_required must be one TRUE or FALSE
-testthat::test_that("calc_ratio validates confidence_intervals_required", {
+testthat::test_that("calculate_ratio validates confidence_intervals_required", {
   
   df <- data.frame(
     value_type_code = 7L,
@@ -184,7 +184,7 @@ testthat::test_that("calc_ratio validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_ratio(
+    calculate_ratio(
       df,
       confidence_intervals_required = "TRUE"
     ),
@@ -192,7 +192,7 @@ testthat::test_that("calc_ratio validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_ratio(
+    calculate_ratio(
       df,
       confidence_intervals_required = c(TRUE, FALSE)
     ),
@@ -200,7 +200,7 @@ testthat::test_that("calc_ratio validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_ratio(
+    calculate_ratio(
       df,
       confidence_intervals_required = NA
     ),
@@ -209,7 +209,7 @@ testthat::test_that("calc_ratio validates confidence_intervals_required", {
 })
 
 # Test 10: Value multiplier is applied
-testthat::test_that("calc_ratio applies the value multiplier", {
+testthat::test_that("calculate_ratio applies the value multiplier", {
   
   df <- data.frame(
     value_type_code = c(7L, 7L),
@@ -218,7 +218,7 @@ testthat::test_that("calc_ratio applies the value multiplier", {
     value_multiplier = c(1, 100)
   )
   
-  result <- calc_ratio(df)
+  result <- calculate_ratio(df)
   
   testthat::expect_equal(
     result$value,
@@ -227,7 +227,7 @@ testthat::test_that("calc_ratio applies the value multiplier", {
 })
 
 # Test 11: No ratio rows returns an empty data frame
-testthat::test_that("calc_ratio handles no ratio rows", {
+testthat::test_that("calculate_ratio handles no ratio rows", {
   
   df <- data.frame(
     value_type_code = c(1L, 2L),
@@ -236,7 +236,7 @@ testthat::test_that("calc_ratio handles no ratio rows", {
     value_multiplier = c(1, 100)
   )
   
-  result <- calc_ratio(df)
+  result <- calculate_ratio(df)
   
   testthat::expect_equal(nrow(result), 0)
   testthat::expect_true(

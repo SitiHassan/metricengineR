@@ -1,6 +1,6 @@
 # Test 1: Basic percentage calculation without confidence intervals
 # Checks that eligible rows are calculated correctly and CI columns remain NA.
-testthat::test_that("calc_percentage calculates percentages without confidence intervals", {
+testthat::test_that("calculate_percentage calculates percentages without confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(2L, 2L),
@@ -9,7 +9,7 @@ testthat::test_that("calc_percentage calculates percentages without confidence i
     value_multiplier = c(100, 100)
   )
   
-  result <- calc_percentage(df)
+  result <- calculate_percentage(df)
   
   testthat::expect_equal(
     result$value,
@@ -28,7 +28,7 @@ testthat::test_that("calc_percentage calculates percentages without confidence i
 
 # Test 2: Percentages above 100% are allowed when CIs are not required
 # This is important for measures such as actual against plan or growth.
-testthat::test_that("calc_percentage allows percentages above 100 without confidence intervals", {
+testthat::test_that("calculate_percentage allows percentages above 100 without confidence intervals", {
   
   df <- data.frame(
     value_type_code = 2L,
@@ -37,7 +37,7 @@ testthat::test_that("calc_percentage allows percentages above 100 without confid
     value_multiplier = 100
   )
   
-  result <- calc_percentage(
+  result <- calculate_percentage(
     df,
     confidence_intervals_required = FALSE
   )
@@ -50,8 +50,8 @@ testthat::test_that("calc_percentage allows percentages above 100 without confid
 
 
 # Test 3: Only percentage value type rows are returned
-# Checks that calc_percentage only processes value_type_code 2.
-testthat::test_that("calc_percentage filters to value type code 2", {
+# Checks that calculate_percentage only processes value_type_code 2.
+testthat::test_that("calculate_percentage filters to value type code 2", {
   
   df <- data.frame(
     value_type_code = c(2L, 9L, 10L, 2L),
@@ -60,7 +60,7 @@ testthat::test_that("calc_percentage filters to value type code 2", {
     value_multiplier = c(100, 100, 100, 100)
   )
   
-  result <- calc_percentage(df)
+  result <- calculate_percentage(df)
   
   testthat::expect_equal(
     nrow(result),
@@ -76,7 +76,7 @@ testthat::test_that("calc_percentage filters to value type code 2", {
 # Test 4: Ineligible rows are retained with NA calculated values
 # Checks missing numerator, missing denominator, zero denominator,
 # and missing multiplier.
-testthat::test_that("calc_percentage retains ineligible rows with NA values", {
+testthat::test_that("calculate_percentage retains ineligible rows with NA values", {
   
   df <- data.frame(
     value_type_code = c(2L, 2L, 2L, 2L, 2L),
@@ -85,7 +85,7 @@ testthat::test_that("calc_percentage retains ineligible rows with NA values", {
     value_multiplier = c(100, 100, 100, 100, NA)
   )
   
-  result <- calc_percentage(df)
+  result <- calculate_percentage(df)
   
   testthat::expect_equal(
     nrow(result),
@@ -113,7 +113,7 @@ testthat::test_that("calc_percentage retains ineligible rows with NA values", {
 
 # Test 5: Custom column names work
 # Checks that the function is not dependent on the default column names.
-testthat::test_that("calc_percentage works with custom column names", {
+testthat::test_that("calculate_percentage works with custom column names", {
   
   df <- data.frame(
     type_code = c(2L, 2L),
@@ -122,7 +122,7 @@ testthat::test_that("calc_percentage works with custom column names", {
     multiplier = c(100, 100)
   )
   
-  result <- calc_percentage(
+  result <- calculate_percentage(
     df,
     value_type_code_col = "type_code",
     numerator_col = "events",
@@ -140,7 +140,7 @@ testthat::test_that("calc_percentage works with custom column names", {
 # Test 6: Valid proportions calculate confidence intervals
 # Checks the confidence interval branch and confirms that values and
 # 95% confidence intervals are returned.
-testthat::test_that("calc_percentage calculates proportion confidence intervals", {
+testthat::test_that("calculate_percentage calculates proportion confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(2L, 2L),
@@ -149,7 +149,7 @@ testthat::test_that("calc_percentage calculates proportion confidence intervals"
     value_multiplier = c(100, 100)
   )
   
-  result <- calc_percentage(
+  result <- calculate_percentage(
     df,
     confidence_intervals_required = TRUE
   )
@@ -179,7 +179,7 @@ testthat::test_that("calc_percentage calculates proportion confidence intervals"
 
 # Test 7: Ineligible rows are still retained when CIs are required
 # Checks that rows such as denominator = 0 are not removed from the output.
-testthat::test_that("calc_percentage retains ineligible rows when confidence intervals are required", {
+testthat::test_that("calculate_percentage retains ineligible rows when confidence intervals are required", {
   
   df <- data.frame(
     value_type_code = c(2L, 2L),
@@ -188,7 +188,7 @@ testthat::test_that("calc_percentage retains ineligible rows when confidence int
     value_multiplier = c(100, 100)
   )
   
-  result <- calc_percentage(
+  result <- calculate_percentage(
     df,
     confidence_intervals_required = TRUE
   )
@@ -219,7 +219,7 @@ testthat::test_that("calc_percentage retains ineligible rows when confidence int
 # Test 8: Numerator greater than denominator is rejected for proportion CIs
 # The same value may be valid as a percentage without CIs but is not
 # a valid genuine proportion.
-testthat::test_that("calc_percentage rejects numerator greater than denominator for proportion CIs", {
+testthat::test_that("calculate_percentage rejects numerator greater than denominator for proportion CIs", {
   
   df <- data.frame(
     value_type_code = 2L,
@@ -229,7 +229,7 @@ testthat::test_that("calc_percentage rejects numerator greater than denominator 
   )
   
   testthat::expect_error(
-    calc_percentage(
+    calculate_percentage(
       df,
       confidence_intervals_required = TRUE
     ),
@@ -240,7 +240,7 @@ testthat::test_that("calc_percentage rejects numerator greater than denominator 
 
 # Test 9: Negative numerator is rejected for proportion CIs
 # Genuine proportions cannot have a negative numerator.
-testthat::test_that("calc_percentage rejects negative numerator for proportion CIs", {
+testthat::test_that("calculate_percentage rejects negative numerator for proportion CIs", {
   
   df <- data.frame(
     value_type_code = 2L,
@@ -250,7 +250,7 @@ testthat::test_that("calc_percentage rejects negative numerator for proportion C
   )
   
   testthat::expect_error(
-    calc_percentage(
+    calculate_percentage(
       df,
       confidence_intervals_required = TRUE
     ),
@@ -260,8 +260,8 @@ testthat::test_that("calc_percentage rejects negative numerator for proportion C
 
 
 # Test 10: Unsupported confidence interval methods are rejected
-# calc_percentage currently only supports proportion confidence intervals.
-testthat::test_that("calc_percentage rejects unsupported confidence interval methods", {
+# calculate_percentage currently only supports proportion confidence intervals.
+testthat::test_that("calculate_percentage rejects unsupported confidence interval methods", {
   
   df <- data.frame(
     value_type_code = 2L,
@@ -271,7 +271,7 @@ testthat::test_that("calc_percentage rejects unsupported confidence interval met
   )
   
   testthat::expect_error(
-    calc_percentage(
+    calculate_percentage(
       df,
       confidence_intervals_required = TRUE,
       ci_method = "rate"
@@ -284,7 +284,7 @@ testthat::test_that("calc_percentage rejects unsupported confidence interval met
 # Test 11: Multiple multipliers are rejected when calculating proportion CIs
 # phe_proportion uses one multiplier for a calculation, so eligible rows
 # must use the same multiplier.
-testthat::test_that("calc_percentage rejects multiple value multipliers for confidence intervals", {
+testthat::test_that("calculate_percentage rejects multiple value multipliers for confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(2L, 2L),
@@ -294,7 +294,7 @@ testthat::test_that("calc_percentage rejects multiple value multipliers for conf
   )
   
   testthat::expect_error(
-    calc_percentage(
+    calculate_percentage(
       df,
       confidence_intervals_required = TRUE
     ),
@@ -305,10 +305,10 @@ testthat::test_that("calc_percentage rejects multiple value multipliers for conf
 
 # Test 12: Non-data-frame inputs are rejected
 # Checks the basic input validation.
-testthat::test_that("calc_percentage rejects non-data-frame input", {
+testthat::test_that("calculate_percentage rejects non-data-frame input", {
   
   testthat::expect_error(
-    calc_percentage(c(1, 2, 3)),
+    calculate_percentage(c(1, 2, 3)),
     "`df` must be a data frame."
   )
 })
@@ -316,7 +316,7 @@ testthat::test_that("calc_percentage rejects non-data-frame input", {
 
 # Test 13: Missing required columns are reported
 # Checks that the function fails clearly when required input columns are absent.
-testthat::test_that("calc_percentage errors when required columns are missing", {
+testthat::test_that("calculate_percentage errors when required columns are missing", {
   
   df <- data.frame(
     value_type_code = c(2L, 2L),
@@ -324,7 +324,7 @@ testthat::test_that("calc_percentage errors when required columns are missing", 
   )
   
   testthat::expect_error(
-    calc_percentage(df),
+    calculate_percentage(df),
     "Missing required columns: denominator, value_multiplier"
   )
 })
@@ -332,7 +332,7 @@ testthat::test_that("calc_percentage errors when required columns are missing", 
 
 # Test 14: confidence_intervals_required must be one TRUE or FALSE
 # Checks character, multiple logical values, and NA.
-testthat::test_that("calc_percentage validates confidence_intervals_required", {
+testthat::test_that("calculate_percentage validates confidence_intervals_required", {
   
   df <- data.frame(
     value_type_code = 2L,
@@ -342,7 +342,7 @@ testthat::test_that("calc_percentage validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_percentage(
+    calculate_percentage(
       df,
       confidence_intervals_required = "TRUE"
     ),
@@ -350,7 +350,7 @@ testthat::test_that("calc_percentage validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_percentage(
+    calculate_percentage(
       df,
       confidence_intervals_required = c(TRUE, FALSE)
     ),
@@ -358,7 +358,7 @@ testthat::test_that("calc_percentage validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_percentage(
+    calculate_percentage(
       df,
       confidence_intervals_required = NA
     ),
@@ -370,7 +370,7 @@ testthat::test_that("calc_percentage validates confidence_intervals_required", {
 # Test 15: All ineligible rows can be returned when CIs are requested
 # Checks that phe_proportion is not required when there are no eligible rows
 # and all calculated values remain NA.
-testthat::test_that("calc_percentage handles no eligible rows with confidence intervals", {
+testthat::test_that("calculate_percentage handles no eligible rows with confidence intervals", {
   
   df <- data.frame(
     value_type_code = c(2L, 2L),
@@ -379,7 +379,7 @@ testthat::test_that("calc_percentage handles no eligible rows with confidence in
     value_multiplier = c(100, 100)
   )
   
-  result <- calc_percentage(
+  result <- calculate_percentage(
     df,
     confidence_intervals_required = TRUE
   )
@@ -403,7 +403,7 @@ testthat::test_that("calc_percentage handles no eligible rows with confidence in
 })
 
 # Test 16: No percentage rows are handled
-testthat::test_that("calc_percentage handles no percentage rows", {
+testthat::test_that("calculate_percentage handles no percentage rows", {
   
   df <- data.frame(
     value_type_code = c(1L, 3L),
@@ -412,7 +412,7 @@ testthat::test_that("calc_percentage handles no percentage rows", {
     value_multiplier = c(100, 100)
   )
   
-  result <- calc_percentage(df)
+  result <- calculate_percentage(df)
   
   testthat::expect_equal(nrow(result), 0)
   
