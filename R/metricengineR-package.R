@@ -2,6 +2,7 @@
 "_PACKAGE"
 
 #' @importFrom rlang .data
+#' @importFrom utils globalVariables
 NULL
 
 utils::globalVariables(
@@ -9,6 +10,9 @@ utils::globalVariables(
     "numerator_ci",
     "denominator_ci",
     "numerator_rate",
-    "denominator_rate"
+    "denominator_rate",
+    "numerator_dasr",
+    "denominator_dasr",
+    "std_pop"
   )
 )
