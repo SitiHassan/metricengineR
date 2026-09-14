@@ -1,10 +1,10 @@
 <mxfile host="app.diagrams.net" agent="OpenAI">
-  <diagram id="calcPercentageStyled" name="calc_percentage" compressed="false">
+  <diagram id="calcPercentageStyled" name="calculate_percentage" compressed="false">
     <mxGraphModel dx="2633" dy="1012" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7e8ff;strokeColor=#1d5fa7;strokeWidth=2;fontSize=24;fontColor=#111111;align=center;verticalAlign=middle;" value="&lt;b&gt;calc_percentage()&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:18px&quot;&gt;Flowchart&lt;/font&gt;" vertex="1">
+        <mxCell id="title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d7e8ff;strokeColor=#1d5fa7;strokeWidth=2;fontSize=24;fontColor=#111111;align=center;verticalAlign=middle;" value="&lt;b&gt;calculate_percentage()&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:18px&quot;&gt;Flowchart&lt;/font&gt;" vertex="1">
           <mxGeometry height="70" width="360" x="390" y="20" as="geometry" />
         </mxCell>
         <mxCell id="keypoints" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#9aa0a6;strokeWidth=1.5;fontSize=15;fontColor=#111111;align=left;verticalAlign=top;spacing=16;" value="&lt;b&gt;Key points&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Only rows with value_type_code == 2 are returned.&lt;br&gt;• All percentage rows are kept in the output.&lt;br&gt;• Rows that cannot be calculated have value, lowercl and uppercl set to NA.&lt;br&gt;• When confidence_intervals_required = FALSE: percentages are calculated normally and can exceed 100%.&lt;br&gt;• When confidence_intervals_required = TRUE: phe_proportion() is used and only valid proportions are allowed.&lt;br&gt;• An error is thrown if multiple multiplier values are found for the CI calculation." vertex="1">
