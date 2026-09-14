@@ -15,7 +15,8 @@ Imports:
     DBI,
     dplyr,
     PHEindicatormethods,
-    rlang
+    rlang,
+    utils
 Suggests: 
     odbc,
     RSQLite,
