@@ -15,7 +15,10 @@ Imports:
     DBI,
     dplyr,
     PHEindicatormethods,
+    purrr,
     rlang,
+    stats,
+    tidyr,
     utils
 Suggests: 
     odbc,
