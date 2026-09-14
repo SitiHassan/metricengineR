@@ -36,7 +36,7 @@
 #' Ineligible rows are retained and their calculated values remain `NA`.
 #'
 #' @export
-calc_percentage <- function(df,
+calculate_percentage <- function(df,
                             value_type_code_col = "value_type_code",
                             numerator_col = "numerator",
                             denominator_col = "denominator",
@@ -115,7 +115,7 @@ calc_percentage <- function(df,
   # Validate confidence interval method
   if(!identical(ci_method, "proportion")){
     stop(
-      "`ci_method` must be \"proportion\" for `calc_percentage()`.",
+      "`ci_method` must be \"proportion\" for `calculate_percentage()`.",
       call. = FALSE
     )
   }

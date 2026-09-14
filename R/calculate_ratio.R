@@ -27,7 +27,7 @@
 #' Confidence intervals for ratios are not currently implemented.
 #'
 #' @export
-calc_ratio <- function(df,
+calculate_ratio <- function(df,
                        value_type_code_col = "value_type_code",
                        numerator_col = "numerator",
                        denominator_col = "denominator",

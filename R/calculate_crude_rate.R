@@ -33,7 +33,7 @@
 #' Ineligible rows are retained with calculated values set to `NA`.
 #'
 #' @export
-calc_crude_rate <- function(df,
+calculate_crude_rate <- function(df,
                             value_type_code_col = "value_type_code",
                             numerator_col = "numerator",
                             denominator_col = "denominator",

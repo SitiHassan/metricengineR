@@ -23,7 +23,7 @@
 #' columns are present before calculation.
 #'
 #' @export
-calc_difference <- function(df, 
+calculate_difference <- function(df, 
                             value_type_code_col = "value_type_code", 
                             minuend_col = "numerator",
                             subtrahend_col = "denominator"){

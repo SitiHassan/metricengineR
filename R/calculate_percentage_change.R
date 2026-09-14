@@ -27,7 +27,7 @@
 #' If the old value is zero or missing, `value` is returned as `NA`.
 #'
 #' @export
-calc_percentage_change <- function(df, 
+calculate_percentage_change <- function(df, 
                                    value_type_code_col = "value_type_code", 
                                    new_value_col = "numerator",
                                    old_value_col = "denominator",

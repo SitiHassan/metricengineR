@@ -18,7 +18,7 @@
 #' `confidence_intervals_required = TRUE`, the function returns an error.
 #'
 #' @export
-calc_count <- function(df,
+calculate_count <- function(df,
                        value_type_code_col = "value_type_code",
                        count_col = "numerator",
                        confidence_intervals_required = FALSE){

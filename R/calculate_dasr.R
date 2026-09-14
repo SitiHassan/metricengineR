@@ -31,7 +31,7 @@
 #' returned as `NA`.
 #'
 #' @export
-calc_dasr <- function(
+calculate_dasr <- function(
     df,
     age_metadata,
     value_type_code_col = "value_type_code",
