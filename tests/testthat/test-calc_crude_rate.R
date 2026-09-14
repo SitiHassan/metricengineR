@@ -340,3 +340,21 @@ testthat::test_that("calc_crude_rate handles no eligible rows with confidence in
     all(is.na(result$uppercl))
   )
 })
+
+testthat::test_that("calc_crude_rate handles no crude rate rows", {
+  
+  df <- data.frame(
+    value_type_code = c(1L, 2L),
+    numerator = c(10, 20),
+    denominator = c(100, 200),
+    value_multiplier = c(1, 100)
+  )
+  
+  result <- calc_crude_rate(df)
+  
+  testthat::expect_equal(nrow(result), 0)
+  
+  testthat::expect_true(
+    all(c("value", "lowercl", "uppercl") %in% names(result))
+  )
+})
