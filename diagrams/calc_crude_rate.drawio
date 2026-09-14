@@ -1,0 +1,158 @@
+<mxfile host="app.diagrams.net" agent="OpenAI">
+  <diagram id="calcCrudeRate" name="calculate_crude_rate" compressed="false">
+    <mxGraphModel dx="3197" dy="1229" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="start" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Start: calculate_crude_rate(df, ...)" vertex="1">
+          <mxGeometry height="60" width="260" x="420" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="validate" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;Validate input&lt;/b&gt;&lt;br&gt;• df is a data frame&lt;br&gt;• required columns exist&lt;br&gt;• confidence_intervals_required is TRUE/FALSE" vertex="1">
+          <mxGeometry height="115" width="410" x="345" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="filter" parent="1" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Filter rows for crude rate value type" vertex="1">
+          <mxGeometry height="70" width="320" x="390" y="265" as="geometry" />
+        </mxCell>
+        <mxCell id="eligible" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="&lt;b&gt;Define eligible rows&lt;/b&gt;&lt;br&gt;&lt;ul&gt;&lt;li style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;numerator not NA&lt;/span&gt;&lt;/li&gt;&lt;li style=&quot;text-align: left;&quot;&gt;denominator not NA and &amp;gt; 0&lt;/li&gt;&lt;li style=&quot;text-align: left;&quot;&gt;value_multiplier not NA&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="105" width="390" x="355" y="375" as="geometry" />
+        </mxCell>
+        <mxCell id="neg_decision" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="Any eligible numerator &lt; 0?" vertex="1">
+          <mxGeometry height="115" width="250" x="425" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="neg_error" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Stop with error&lt;br&gt;Negative numerator is invalid for crude rates" vertex="1">
+          <mxGeometry height="85" width="300" x="780" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="init" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;b&gt;Initialise output columns&lt;/b&gt;&lt;br&gt;value = NA&lt;br&gt;lowercl = NA&lt;br&gt;uppercl = NA" vertex="1">
+          <mxGeometry height="95" width="310" x="395" y="685" as="geometry" />
+        </mxCell>
+        <mxCell id="ci_decision" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="Are confidence intervals required?" vertex="1">
+          <mxGeometry height="120" width="280" x="410" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="no_ci_calc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="For eligible rows:&lt;br&gt;value = numerator / denominator × value_multiplier&lt;br&gt;lowercl = NA&lt;br&gt;uppercl = NA" vertex="1">
+          <mxGeometry height="120" width="360" x="70" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="no_ci_return" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Return crude rate rows&lt;br&gt;ineligible rows remain NA" vertex="1">
+          <mxGeometry height="65" width="230" x="135" y="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="any_eligible" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="Any eligible rows?" vertex="1">
+          <mxGeometry height="110" width="240" x="760" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="multiplier" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Get unique value_multiplier values from eligible rows" vertex="1">
+          <mxGeometry height="80" width="320" x="720" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="multi_decision" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;" value="More than one multiplier?" vertex="1">
+          <mxGeometry height="115" width="250" x="755" y="1135" as="geometry" />
+        </mxCell>
+        <mxCell id="multi_error" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Stop with error&lt;br&gt;More than one multiplier found" vertex="1">
+          <mxGeometry height="80" width="250" x="1090" y="1155" as="geometry" />
+        </mxCell>
+        <mxCell id="phe_rate" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Use PHEindicatormethods::phe_rate()&lt;br&gt;for eligible rows&lt;br&gt;confidence = 0.95&lt;br&gt;type = standard" vertex="1">
+          <mxGeometry height="115" width="350" x="705" y="1310" as="geometry" />
+        </mxCell>
+        <mxCell id="assign" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Assign value, lowercl and uppercl&lt;br&gt;back to eligible rows" vertex="1">
+          <mxGeometry height="80" width="290" x="735" y="1470" as="geometry" />
+        </mxCell>
+        <mxCell id="ci_return" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Return crude rate rows&lt;br&gt;ineligible rows remain NA" vertex="1">
+          <mxGeometry height="65" width="230" x="765" y="1600" as="geometry" />
+        </mxCell>
+        <mxCell id="no_eligible_return" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;" value="Return rows with value/CIs as NA" vertex="1">
+          <mxGeometry height="65" width="240" x="1080" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="key" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;spacingTop=8;spacingLeft=8;" value="&lt;b&gt;Key logic&lt;/b&gt;&lt;br&gt;• Crude rates only process their own value type&lt;br&gt;• Negative numerators are invalid&lt;br&gt;• Missing/zero denominators stay in output as NA&lt;br&gt;• CIs use phe_rate() only when requested" vertex="1">
+          <mxGeometry height="135" width="430" x="70" y="1360" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="start" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="validate">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="validate" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="filter">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="filter" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="eligible">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="eligible" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="neg_decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="neg_decision" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="neg_error">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5l" connectable="0" parent="e5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="YES" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="neg_decision" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="init">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6l" connectable="0" parent="e6" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="NO" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint x="-12" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="init" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="ci_decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="ci_decision" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="no_ci_calc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8l" connectable="0" parent="e8" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="FALSE" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint x="-5" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="no_ci_calc" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="no_ci_return">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="ci_decision" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="any_eligible">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10l" connectable="0" parent="e10" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="TRUE" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint x="5" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="any_eligible" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="no_eligible_return">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11l" connectable="0" parent="e11" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="NO" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="any_eligible" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="multiplier">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12l" connectable="0" parent="e12" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="YES" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint x="-10" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="multiplier" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="multi_decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="multi_decision" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="multi_error">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14l" connectable="0" parent="e14" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="YES" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="multi_decision" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="phe_rate">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15l" connectable="0" parent="e15" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" value="NO" vertex="1">
+          <mxGeometry relative="1" x="-0.1" y="-0.1" as="geometry">
+            <mxPoint x="-12" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="phe_rate" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="assign">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="assign" style="endArrow=block;html=1;rounded=0;strokeWidth=1.5;" target="ci_return">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
