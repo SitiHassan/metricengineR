@@ -98,9 +98,9 @@ calc_crude_rate <- function(df,
   }
   
   # Initialise calculated columns
-  result$value <- NA_real_
-  result$lowercl <- NA_real_
-  result$uppercl <- NA_real_
+  result$value <- rep(NA_real_, nrow(result))
+  result$lowercl <- rep(NA_real_, nrow(result))
+  result$uppercl <- rep(NA_real_, nrow(result))
   
   # Calculate crude rates without confidence intervals
   if(!confidence_intervals_required){
