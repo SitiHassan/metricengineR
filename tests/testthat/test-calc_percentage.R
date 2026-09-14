@@ -401,3 +401,22 @@ testthat::test_that("calc_percentage handles no eligible rows with confidence in
     all(is.na(result$uppercl))
   )
 })
+
+# Test 16: No percentage rows are handled
+testthat::test_that("calc_percentage handles no percentage rows", {
+  
+  df <- data.frame(
+    value_type_code = c(1L, 3L),
+    numerator = c(10, 20),
+    denominator = c(100, 200),
+    value_multiplier = c(100, 100)
+  )
+  
+  result <- calc_percentage(df)
+  
+  testthat::expect_equal(nrow(result), 0)
+  
+  testthat::expect_true(
+    all(c("value", "lowercl", "uppercl") %in% names(result))
+  )
+})
