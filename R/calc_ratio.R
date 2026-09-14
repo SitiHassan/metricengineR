@@ -82,9 +82,9 @@ calc_ratio <- function(df,
     !is.na(result[[value_multiplier_col]])
   
   # Initialise calculated columns
-  result$value <- NA_real_
-  result$lowercl <- NA_real_
-  result$uppercl <- NA_real_
+  result$value <- rep(NA_real_, nrow(result))
+  result$lowercl <- rep(NA_real_, nrow(result))
+  result$uppercl <- rep(NA_real_, nrow(result))
   
   if(confidence_intervals_required){
     stop(
