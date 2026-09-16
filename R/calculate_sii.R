@@ -119,10 +119,15 @@
 #'   `value` column. Must be either `"absolute"` or `"signed"`.
 #'   Defaults to `"absolute"`.
 #'
-#' @return A data frame containing one row per SII calculation with `value`,
-#'   `lowercl`, `uppercl`, `sii_signed_percentage_points`,
+#' @return A data frame containing one row per SII calculation with:
+#'   `numerator` and `denominator` summed across all deprivation groups,
+#'   `value`, `lowercl`, `uppercl`, `sii_signed_percentage_points`,
 #'   `sii_absolute_percentage_points`, and `sii_direction`.
-#'
+#'   
+#' The returned `numerator` and `denominator` are the totals across all
+#' deprivation groups included in the SII calculation. They are provided as
+#' summary values and are not used as a pooled proportion to calculate the SII.
+#' 
 #' @details
 #' Rows with value type codes other than 14 are excluded before calculation.
 #'
