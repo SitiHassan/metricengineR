@@ -442,14 +442,14 @@ calculate_sii <- function(
         abs(.data$sii_signed_percentage_points),
       
       sii_direction = dplyr::case_when(
+        abs(.data$sii_signed_percentage_points) < 1e-10 ~ # to handle tiny numerical rounding value e.g., -2.3e-15 is effectively zero
+          "No deprivation gradient",
+        
         .data$sii_signed_percentage_points > 0 ~
           "Higher in most deprived",
         
-        .data$sii_signed_percentage_points < 0 ~
-          "Higher in least deprived",
-        
         TRUE ~
-          "No deprivation gradient"
+          "Higher in least deprived"
       ),
       
       value = if(value_output == "absolute"){
