@@ -1,3 +1,5 @@
+library(dplyr)
+
 # Function to create pooled data -----------------------------------------------
 # Inputs:
 #   df  - data frame containing at least POOL_KEYS, `start_date`, `numerator`,
@@ -19,8 +21,14 @@
 #   - One yearly record per POOL_KEYS ? year is constructed internally before pooling.
 #   - If custom window tables are provided, they must have integer `from`/`to` years.
 
+POOL_KEYS <- c(
+  "indicator_id","imd_code","aggregation_id",
+  "age_group_code","sex_code","ethnicity_code",
+  "creation_date","value_type_code","source_code","combination_id"
+)
 
-create_pooled_data <- function(df, ks = c(3,5),
+
+create_pooled_data_original <- function(df, ks = c(3,5),
                                       POOL_KEYS,
                                       time_period_3yrs = NULL,
                                       time_period_5yrs = NULL) {
@@ -107,3 +115,4 @@ create_pooled_data <- function(df, ks = c(3,5),
   
   pooled
 }
+
