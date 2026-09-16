@@ -1,118 +1,265 @@
-library(dplyr)
-
-# Function to create pooled data -----------------------------------------------
-# Inputs:
-#   df  - data frame containing at least POOL_KEYS, `start_date`, `numerator`,
-#         `denominator`, `period_type` ("Calendar"/"Financial"), and `population_type`
-#   ks  - integer vector of window sizes to pool over (e.g., c(3, 5))
-#   time_period_3yrs (optional) - data frame with columns `from`, `to` defining
-#         explicit 3-year windows; if NULL, windows are auto-generated from data
-#   time_period_5yrs (optional) - data frame with columns `from`, `to` defining
-#         explicit 5-year windows; if NULL, windows are auto-generated from data
-#
-# Output:
-#   A data frame containing only the 3- and/or 5-year pooled rows (no yearly rows),
-#   where `numerator` and `denominator` are summed over each window, dates are set
-#   from `from`/`to` according to `period_type`, and `time_period_type` is
-#   "3 year pooled" or "5 year pooled".
-#
-# Notes/Assumptions:
-#   - Only rows with `population_type == "Census"` are considered.
-#   - One yearly record per POOL_KEYS ? year is constructed internally before pooling.
-#   - If custom window tables are provided, they must have integer `from`/`to` years.
-
-POOL_KEYS <- c(
-  "indicator_id","imd_code","aggregation_id",
-  "age_group_code","sex_code","ethnicity_code",
-  "creation_date","value_type_code","source_code","combination_id"
-)
-
-
-create_pooled_data_original <- function(df, ks = c(3,5),
-                                      POOL_KEYS,
-                                      time_period_3yrs = NULL,
-                                      time_period_5yrs = NULL) {
+#' Create Pooled Multi-Year Data
+#'
+#' Creates pooled multi-year data from yearly Calendar or Financial year records.
+#' Numerators and denominators are summed across rolling year windows such as
+#' 3-year or 5-year periods.
+#'
+#' @param df A data frame containing yearly records to be pooled. It must include
+#'   the pooling key columns, `start_date`, `numerator`, `denominator`, and
+#'   `period_type`.
+#' @param span_years Integer vector giving the number of years to include in each
+#'   pooled period. Defaults to `c(3L, 5L)`.
+#' @param pool_keys Character vector of column names used to group records before
+#'   pooling.
+#'
+#' @return A data frame containing pooled records with summed `numerator` and
+#'   `denominator` values and newly created `start_date`, `end_date`, and
+#'   `time_period_type` columns.
+#'
+#' @details
+#' Only rows where `period_type` is `"Calendar"` or `"Financial"` are included.
+#'
+#' Calendar pooled periods run from 1 January to 31 December. Financial year
+#' pooled periods run from 1 April to 31 March.
+#'
+#' Only complete pooling windows are returned. For example, a 3-year pooled
+#' result is only created when all three years are present.
+#'
+#' @export
+create_pooled_data <- function(
+    df,
+    span_years = c(3L, 5L),
+    pool_keys = c(
+      "indicator_id",
+      "imd_code",
+      "aggregation_id",
+      "age_group_code",
+      "sex_code",
+      "ethnicity_code",
+      "creation_date",
+      "value_type_code",
+      "source_code",
+      "combination_id"
+    )) {
   
-  # Select only indicators which use Census as denominator source
-  df <- df |> filter(population_type == "Census")
+  # Validate inputs 
   
-  # Group data by POOL KEYS and year
+  if(!is.data.frame(df)){
+    stop(
+      "`df` must be a data frame.",
+      call. = FALSE
+    )
+  }
+  
+  if(
+    !is.numeric(span_years) ||
+    length(span_years) == 0L ||
+    any(is.na(span_years)) ||
+    any(!is.finite(span_years)) ||
+    any(span_years %% 1 != 0) ||
+    any(span_years < 1)
+  ){
+    stop(
+      "`span_years` must contain whole numbers greater than or equal to 1.",
+      call. = FALSE
+    )
+  }
+  
+  span_years <- as.integer(span_years)
+  
+  required_cols <- c(
+    pool_keys,
+    "start_date", # end_date is not required for the calculation of pooled periods
+    "numerator",
+    "denominator",
+    "period_type"
+  )
+  
+  missing_cols <- setdiff(
+    required_cols,
+    names(df)
+  )
+  
+  if(length(missing_cols) > 0){
+    stop(
+      paste0(
+        "Missing required columns: ",
+        paste(missing_cols, collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+  
+  
+  # Create yearly data 
+  
   yearly <- df |>
-    mutate(period_year = lubridate::year(as.Date(start_date))) |>
-    filter(period_type %in% c("Calendar","Financial"),
-           !is.na(period_year)) |>
-    group_by(across(all_of(POOL_KEYS)), period_type, period_year, ) |>
-    summarise(
-      numerator   = sum(numerator,   na.rm = TRUE),
-      denominator = sum(denominator, na.rm = TRUE),
+    dplyr::mutate(
+      period_year = lubridate::year(
+        as.Date(.data$start_date)
+      )
+    ) |>
+    dplyr::filter(
+      .data$period_type %in% c(
+        "Calendar",
+        "Financial"
+      ),
+      !is.na(.data$period_year)
+    ) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(pool_keys)
+      ),
+      .data$period_type,
+      .data$period_year
+    ) |>
+    dplyr::summarise(
+      numerator = sum(
+        .data$numerator,
+        na.rm = TRUE
+      ),
+      denominator = sum(
+        .data$denominator,
+        na.rm = TRUE
+      ),
       .groups = "drop"
     )
   
-  if (nrow(yearly) == 0) return(slice(df, 0)) # empty in, empty out
   
-  # Build range windows (use data span if not provided)
-  miny <- min(yearly$period_year, na.rm = TRUE)
-  maxy <- max(yearly$period_year, na.rm = TRUE)
+  # Return empty result if there is no yearly data 
   
-  ranges_list <- list()
-  if (3 %in% ks) {
-    rng3 <- if (is.null(time_period_3yrs)) {
-      # auto-generate from data
-      tibble::tibble(from = seq.int(miny, maxy - 2), to = from + 2, k = 3L)
-    } else {
-      time_period_3yrs |>  transmute(from = as.integer(from), to = as.integer(to), k = 3L)
+  if(nrow(yearly) == 0L){
+    return(
+      dplyr::slice(df, 0)
+    )
+  }
+  
+  
+  # Determine available year range 
+  
+  min_year <- min(
+    yearly$period_year,
+    na.rm = TRUE
+  )
+  
+  max_year <- max(
+    yearly$period_year,
+    na.rm = TRUE
+  )
+  
+  
+  # Generate pooling windows 
+  
+  ranges <- lapply(
+    span_years,
+    function(k){
+      
+      generate_year_windows(
+        min_year = min_year,
+        max_year = max_year,
+        span_years = k
+      )
     }
-    ranges_list <- c(ranges_list, list(rng3))
-  }
-  if (5 %in% ks) {
-    rng5 <- if (is.null(time_period_5yrs)) {
-      tibble(from = seq.int(miny, maxy - 4), to = from + 4, k = 5L)
-    } else {
-      time_period_5yrs |>  transmute(from = as.integer(from), to = as.integer(to), k = 5L)
-    }
-    ranges_list <- c(ranges_list, list(rng5))
-  }
-  ranges <- bind_rows(ranges_list)
+  ) |>
+    dplyr::bind_rows()
   
-  # If the ranges sit outside the data years, drop those that cant match
-  ranges <- ranges |>  filter(from >= miny, to <= maxy)
   
-  if (nrow(ranges) == 0) {
-    return(df |>  slice(0))
+  if(nrow(ranges) == 0L){
+    return(
+      dplyr::slice(df, 0)
+    )
   }
   
-  # Non-equi join each yearly row to all windows that cover its year
+  
+  # Match yearly records to pooling windows 
+  
   pooled <- yearly |>
-    inner_join(ranges, by = join_by(period_year >= from, period_year <= to)) |>
-    group_by(across(all_of(POOL_KEYS)), period_type, from, to, k) |>
-    summarise(
-      numerator   = sum(numerator,   na.rm = TRUE),
-      denominator = sum(denominator, na.rm = TRUE),
+    dplyr::inner_join(
+      ranges,
+      by = dplyr::join_by(
+        period_year >= from,
+        period_year <= to
+      )
+    ) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(pool_keys)
+      ),
+      .data$period_type,
+      .data$from,
+      .data$to,
+      .data$k
+    ) |>
+    dplyr::summarise(
+      numerator = sum(
+        .data$numerator,
+        na.rm = TRUE
+      ),
+      denominator = sum(
+        .data$denominator,
+        na.rm = TRUE
+      ),
+      years_present = dplyr::n_distinct(
+        .data$period_year
+      ),
       .groups = "drop"
     ) |>
-    mutate(
-      # Map window start/end to actual dates by period_type
-      start_date = if_else(
-        period_type == "Calendar",
-        lubridate::make_date(from, 1, 1),
-        lubridate::make_date(from, 4, 1)
-      ),
-      end_date = if_else(
-        period_type == "Calendar",
-        lubridate::make_date(to, 12, 31),
-        lubridate::make_date(to + 1, 3, 31)
-      ),
-      time_period_type = paste0(k, " year pooled"),
-      indicator_value = NA_real_, lower_ci95 = NA_real_, upper_ci95 = NA_real_
+    
+    # Only keep complete pooling windows
+    dplyr::filter(
+      .data$years_present == .data$k
     ) |>
-    transmute(
-      indicator_id, start_date, end_date,
-      numerator, denominator,
-      indicator_value, lower_ci95, upper_ci95,
-      imd_code, aggregation_id, age_group_code, sex_code, ethnicity_code,
-      creation_date, value_type_code, source_code, time_period_type, combination_id
+    
+    dplyr::mutate(
+      
+      start_date = dplyr::if_else(
+        .data$period_type == "Calendar",
+        lubridate::make_date(
+          .data$from,
+          1,
+          1
+        ),
+        lubridate::make_date(
+          .data$from,
+          4,
+          1
+        )
+      ),
+      
+      end_date = dplyr::if_else(
+        .data$period_type == "Calendar",
+        lubridate::make_date(
+          .data$to,
+          12,
+          31
+        ),
+        lubridate::make_date(
+          .data$to + 1L,
+          3,
+          31
+        )
+      ),
+      
+      time_period_type = paste0(
+        .data$k,
+        " year pooled"
+      ),
+      
+      indicator_value = NA_real_,
+      lower_ci95 = NA_real_,
+      upper_ci95 = NA_real_
+    ) |>
+    dplyr::select(
+      -dplyr::all_of(
+        c(
+          "from",
+          "to",
+          "k",
+          "years_present",
+          "period_type"
+        )
+      )
     )
   
   pooled
 }
-
