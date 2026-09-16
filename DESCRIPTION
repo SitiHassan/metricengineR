@@ -19,6 +19,7 @@ Imports:
     purrr,
     rlang,
     stats,
+    stringr,
     tidyr,
     utils
 Suggests: 
