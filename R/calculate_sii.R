@@ -127,7 +127,13 @@
 #' Rows with value type codes other than 14 are excluded before calculation.
 #'
 #' Each SII calculation must contain exactly one row for deprivation groups
-#' 1 to `n_deprivation_groups`. Numerators and denominators must represent valid
+#' 1 to `n_deprivation_groups`. 
+#' 
+#' Input data must already be grouped into the deprivation grouping required for
+#' the calculation. For example, quintile SII requires groups 1 to 5, while
+#' decile SII requires groups 1 to 10.
+#' 
+#' Numerators and denominators must represent valid
 #' proportions, and each deprivation group must have a positive finite
 #' variance.
 #'
