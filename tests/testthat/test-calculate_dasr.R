@@ -82,9 +82,9 @@ age_metadata <- data.frame(
 )
 
 # Test 1: Calculates one DASR for each indicator
-testthat::test_that("calc_dasr calculates DASRs for different age ranges", {
+testthat::test_that("calculate_dasr calculates DASRs for different age ranges", {
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     test_dasr_data,
     age_metadata
   )
@@ -113,7 +113,7 @@ testthat::test_that("calc_dasr calculates DASRs for different age ranges", {
 })
 
 # Test 2: DASR for age groups 5-18 matches PHEindicatormethods::calculate_dsr()
-testthat::test_that("calc_dasr matches PHE calculate_dsr for age groups 5 to 18", {
+testthat::test_that("calculate_dasr matches PHE calculate_dsr for age groups 5 to 18", {
   
   df_5_18 <- test_dasr_data |>
     dplyr::filter(
@@ -149,7 +149,7 @@ testthat::test_that("calc_dasr matches PHE calculate_dsr for age groups 5 to 18"
       multiplier = 100000
     )
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     test_dasr_data,
     age_metadata
   ) |>
@@ -174,9 +174,9 @@ testthat::test_that("calc_dasr matches PHE calculate_dsr for age groups 5 to 18"
 })
 
 # Test 3: Different age ranges are calculated separately
-testthat::test_that("calc_dasr keeps different DASR groups separate", {
+testthat::test_that("calculate_dasr keeps different DASR groups separate", {
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     test_dasr_data,
     age_metadata
   )
@@ -207,7 +207,7 @@ testthat::test_that("calc_dasr keeps different DASR groups separate", {
 })
 
 # Test 4: Different multipliers are supported
-testthat::test_that("calc_dasr supports different value multipliers", {
+testthat::test_that("calculate_dasr supports different value multipliers", {
   
   df_1000 <- create_test_dasr_rows(
     indicator_id = 101L,
@@ -239,7 +239,7 @@ testthat::test_that("calc_dasr supports different value multipliers", {
     )
   )
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     df,
     metadata
   )
@@ -259,9 +259,9 @@ testthat::test_that("calc_dasr supports different value multipliers", {
 })
 
 # Test 5: Confidence intervals can be removed
-testthat::test_that("calc_dasr removes confidence intervals when not required", {
+testthat::test_that("calculate_dasr removes confidence intervals when not required", {
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     test_dasr_data,
     age_metadata,
     confidence_intervals_required = FALSE
@@ -281,7 +281,7 @@ testthat::test_that("calc_dasr removes confidence intervals when not required", 
 })
 
 # Test 6: Only DASR rows are calculated
-testthat::test_that("calc_dasr filters to value type code 4", {
+testthat::test_that("calculate_dasr filters to value type code 4", {
   
   non_dasr <- test_dasr_data[1, ]
   
@@ -293,7 +293,7 @@ testthat::test_that("calc_dasr filters to value type code 4", {
     non_dasr
   )
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     df,
     age_metadata
   )
@@ -309,9 +309,9 @@ testthat::test_that("calc_dasr filters to value type code 4", {
 })
 
 # Test 7: Final age group comes from age_metadata
-testthat::test_that("calc_dasr adds final age group code from metadata", {
+testthat::test_that("calculate_dasr adds final age group code from metadata", {
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     test_dasr_data,
     age_metadata
   ) |>
@@ -331,7 +331,7 @@ testthat::test_that("calc_dasr adds final age group code from metadata", {
 })
 
 # Test 8: Inconsistent multipliers within one DASR are rejected
-testthat::test_that("calc_dasr rejects inconsistent multipliers within a DASR", {
+testthat::test_that("calculate_dasr rejects inconsistent multipliers within a DASR", {
   
   df <- test_dasr_data
   
@@ -342,7 +342,7 @@ testthat::test_that("calc_dasr rejects inconsistent multipliers within a DASR", 
   df$value_multiplier[rows[1]] <- 1000
   
   testthat::expect_error(
-    calc_dasr(
+    calculate_dasr(
       df,
       age_metadata
     ),
@@ -351,14 +351,14 @@ testthat::test_that("calc_dasr rejects inconsistent multipliers within a DASR", 
 })
 
 # Test 9: Missing value multipliers are rejected
-testthat::test_that("calc_dasr rejects missing value multipliers", {
+testthat::test_that("calculate_dasr rejects missing value multipliers", {
   
   df <- test_dasr_data
   
   df$value_multiplier[1] <- NA
   
   testthat::expect_error(
-    calc_dasr(
+    calculate_dasr(
       df,
       age_metadata
     ),
@@ -367,14 +367,14 @@ testthat::test_that("calc_dasr rejects missing value multipliers", {
 })
 
 # Test 10: Unknown age groups are rejected
-testthat::test_that("calc_dasr rejects age groups not found in ESP 2013", {
+testthat::test_that("calculate_dasr rejects age groups not found in ESP 2013", {
   
   df <- test_dasr_data
   
   df$age_group_code[1] <- 99L
   
   testthat::expect_error(
-    calc_dasr(
+    calculate_dasr(
       df,
       age_metadata
     ),
@@ -383,7 +383,7 @@ testthat::test_that("calc_dasr rejects age groups not found in ESP 2013", {
 })
 
 # Test 11: Missing required columns are reported
-testthat::test_that("calc_dasr reports missing required columns", {
+testthat::test_that("calculate_dasr reports missing required columns", {
   
   df <- test_dasr_data |>
     dplyr::select(
@@ -391,7 +391,7 @@ testthat::test_that("calc_dasr reports missing required columns", {
     )
   
   testthat::expect_error(
-    calc_dasr(
+    calculate_dasr(
       df,
       age_metadata
     ),
@@ -400,10 +400,10 @@ testthat::test_that("calc_dasr reports missing required columns", {
 })
 
 # Test 12: Invalid confidence interval argument is rejected
-testthat::test_that("calc_dasr validates confidence_intervals_required", {
+testthat::test_that("calculate_dasr validates confidence_intervals_required", {
   
   testthat::expect_error(
-    calc_dasr(
+    calculate_dasr(
       test_dasr_data,
       age_metadata,
       confidence_intervals_required = "TRUE"
@@ -412,7 +412,7 @@ testthat::test_that("calc_dasr validates confidence_intervals_required", {
   )
   
   testthat::expect_error(
-    calc_dasr(
+    calculate_dasr(
       test_dasr_data,
       age_metadata,
       confidence_intervals_required = NA
@@ -422,13 +422,13 @@ testthat::test_that("calc_dasr validates confidence_intervals_required", {
 })
 
 # Test 13: No DASR rows returns an empty result
-testthat::test_that("calc_dasr handles data with no DASR rows", {
+testthat::test_that("calculate_dasr handles data with no DASR rows", {
   
   df <- test_dasr_data
   
   df$value_type_code <- 2L
   
-  result <- calc_dasr(
+  result <- calculate_dasr(
     df,
     age_metadata
   )
