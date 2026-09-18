@@ -25,7 +25,8 @@ Imports:
 Suggests: 
     odbc,
     RSQLite,
-    testthat
+    testthat,
+    writexl
 Config/roxygen2/version: 8.1.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
