@@ -17,6 +17,7 @@ Imports:
     lubridate,
     PHEindicatormethods,
     purrr,
+    readxl,
     rlang,
     stats,
     stringr,
