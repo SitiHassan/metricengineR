@@ -14,6 +14,7 @@ Depends:
 Imports: 
     DBI,
     dplyr,
+    httr,
     lubridate,
     PHEindicatormethods,
     purrr,
@@ -24,6 +25,7 @@ Imports:
     tidyr,
     utils
 Suggests: 
+    curl,
     odbc,
     RSQLite,
     testthat,
