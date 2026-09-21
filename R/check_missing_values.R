@@ -204,12 +204,6 @@ check_missing_values <- function(
       " row(s) with missing values in the checked columns."
     )
     
-    print(
-      utils::head(
-        missing_summary,
-        show_n
-      )
-    )
   }
   
   
