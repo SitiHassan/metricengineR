@@ -1,97 +1,115 @@
-# Helper data 
+# Helper data
 
 create_test_missing_values_data <- function() {
   
   data.frame(
     indicator_id = c(101L, 102L, 103L, 104L),
-    numerator = c(10, NA, 30, 40),
-    denominator = c(100, NA, 300, 400),
-    indicator_value = c(10, 20, NA, 40),
-    lower_ci95 = c(8, NA, 25, 35),
-    upper_ci95 = c(12, NA, 35, 45),
-    source_code = c(1L, NA, 1L, 1L),
-    aggregation_id = c(151L, 151L, 151L, 151L)
+    start_date = as.Date(
+      c(
+        "2025-01-01",
+        "2025-01-01",
+        "2025-01-01",
+        "2025-01-01"
+      )
+    ),
+    end_date = as.Date(
+      c(
+        "2025-12-31",
+        "2025-12-31",
+        "2025-12-31",
+        "2025-12-31"
+      )
+    ),
+    indicator_value = c(10, 20, 30, 40),
+    time_period_type = c(
+      "1 year",
+      "1 year",
+      NA,
+      "1 year"
+    ),
+    combination_id = c(
+      4L,
+      4L,
+      4L,
+      NA_integer_
+    ),
+    source_code = c(
+      1L,
+      NA_integer_,
+      1L,
+      1L
+    )
   )
 }
 
 
-create_test_missing_values_metadata <- function() {
-  
-  data.frame(
-    indicator_id = c(101L, 102L, 103L, 104L),
-    status_code = c(1L, 2L, 3L, 1L),
-    precalculated = c("No", "No", "No", "Yes")
-  )
-}
-
-# Test 1: Missing values are identified 
+# Test 1: Default columns with missing values are identified
 
 testthat::test_that(
-  "check_missing_values identifies missing values",
+  "check_missing_values identifies missing values in default columns",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata
+    suppressMessages(
+      result <- check_missing_values(df)
     )
     
     testthat::expect_equal(
       nrow(result),
-      1L
+      3L
     )
     
     testthat::expect_equal(
       result$indicator_id,
-      102L
+      c(102L, 103L, 104L)
     )
   }
 )
 
 
-# Test 2: Ignored columns do not trigger missing values 
+# Test 2: Missing column names are returned
 
 testthat::test_that(
-  "check_missing_values ignores default excluded columns",
+  "check_missing_values identifies which columns are missing",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
-    # Remove the missing source_code so indicator 102 only has missing
-    # values in columns ignored by default
-    df$source_code[df$indicator_id == 102L] <- 1L
-    
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata
+    suppressMessages(
+      result <- check_missing_values(df)
     )
     
     testthat::expect_equal(
-      nrow(result),
-      0L
+      result$missing_columns,
+      c(
+        "source_code",
+        "time_period_type",
+        "combination_id"
+      )
     )
   }
 )
 
 
-# Test 3: Specific columns can be checked 
+# Test 3: More than one missing column is reported for the same row
 
 testthat::test_that(
-  "check_missing_values checks specified columns",
+  "check_missing_values reports multiple missing columns for one row",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata,
-      cols = c(
-        "numerator",
-        "denominator"
+    df$start_date[2] <- NA
+    df$source_code[2] <- NA_integer_
+    
+    suppressMessages(
+      result <- check_missing_values(
+        df,
+        cols = c(
+          "start_date",
+          "source_code"
+        )
       )
     )
     
@@ -104,26 +122,67 @@ testthat::test_that(
       result$indicator_id,
       102L
     )
+    
+    testthat::expect_equal(
+      result$missing_columns,
+      "start_date, source_code"
+    )
   }
 )
 
 
-# Test 4: Status codes control which indicators are checked 
+# Test 4: Specific columns can be checked
 
 testthat::test_that(
-  "check_missing_values applies status code filtering",
+  "check_missing_values checks only specified columns",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata,
-      status_codes = 1L
+    suppressMessages(
+      result <- check_missing_values(
+        df,
+        cols = "source_code"
+      )
     )
     
-    # Indicator 102 has status 2, so it should not be checked
+    testthat::expect_equal(
+      nrow(result),
+      1L
+    )
+    
+    testthat::expect_equal(
+      result$indicator_id,
+      102L
+    )
+    
+    testthat::expect_equal(
+      result$missing_columns,
+      "source_code"
+    )
+  }
+)
+
+
+# Test 5: Columns not selected are not checked
+
+testthat::test_that(
+  "check_missing_values ignores missing values outside selected columns",
+  {
+    
+    df <- create_test_missing_values_data()
+    
+    suppressMessages(
+      result <- check_missing_values(
+        df,
+        cols = c(
+          "indicator_id",
+          "start_date",
+          "end_date"
+        )
+      )
+    )
+    
     testthat::expect_equal(
       nrow(result),
       0L
@@ -132,153 +191,182 @@ testthat::test_that(
 )
 
 
-# Test 5: Default status codes include 1 and 2 
+# Test 6: Blank character values are identified
 
 testthat::test_that(
-  "check_missing_values includes status codes 1 and 2 by default",
+  "check_missing_values identifies blank character values",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata
+    df$time_period_type[1] <- ""
+    
+    suppressMessages(
+      result <- check_missing_values(
+        df,
+        cols = "time_period_type"
+      )
     )
     
     testthat::expect_true(
-      102L %in% result$indicator_id
-    )
-  }
-)
-
-
-# Test 6: Precalculated indicators are excluded 
-
-testthat::test_that(
-  "check_missing_values excludes precalculated indicators",
-  {
-    
-    df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
-    
-    # Indicator 104 is precalculated, so create a missing value
-    df$source_code[df$indicator_id == 104L] <- NA
-    
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata
+      101L %in% result$indicator_id
     )
     
-    testthat::expect_false(
-      104L %in% result$indicator_id
-    )
-  }
-)
-
-
-# Test 7: Indicators outside selected statuses are excluded 
-
-testthat::test_that(
-  "check_missing_values excludes indicators outside selected statuses",
-  {
-    
-    df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
-    
-    # Indicator 103 has status 3 and already has missing indicator_value
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata
-    )
-    
-    testthat::expect_false(
+    testthat::expect_true(
       103L %in% result$indicator_id
     )
   }
 )
 
 
-# Test 8: No missing values returns empty result 
+# Test 7: Whitespace-only character values are identified
+
+testthat::test_that(
+  "check_missing_values identifies whitespace-only values",
+  {
+    
+    df <- create_test_missing_values_data()
+    
+    df$time_period_type <- "1 year"
+    df$time_period_type[2] <- "   "
+    
+    suppressMessages(
+      result <- check_missing_values(
+        df,
+        cols = "time_period_type"
+      )
+    )
+    
+    testthat::expect_equal(
+      nrow(result),
+      1L
+    )
+    
+    testthat::expect_equal(
+      result$indicator_id,
+      102L
+    )
+    
+    testthat::expect_equal(
+      result$missing_columns,
+      "time_period_type"
+    )
+  }
+)
+
+
+# Test 8: No missing values returns an empty data frame
 
 testthat::test_that(
   "check_missing_values returns empty data frame when no missing values exist",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
+    df$time_period_type <- "1 year"
+    df$combination_id <- 4L
     df$source_code <- 1L
-    df$indicator_value <- c(10, 20, 30, 40)
     
-    result <- check_missing_values(
-      df = df,
-      metadata = metadata
+    suppressMessages(
+      result <- check_missing_values(df)
     )
     
     testthat::expect_equal(
       nrow(result),
       0L
     )
+    
+    testthat::expect_true(
+      is.data.frame(result)
+    )
   }
 )
 
 
-# Test 9: PASS message is returned 
+# Test 9: PASS message is returned
 
 testthat::test_that(
   "check_missing_values reports when no missing values are found",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
+    df$time_period_type <- "1 year"
+    df$combination_id <- 4L
     df$source_code <- 1L
-    df$indicator_value <- c(10, 20, 30, 40)
     
     testthat::expect_message(
-      check_missing_values(
-        df = df,
-        metadata = metadata
-      ),
-      "PASS: No rows with missing values"
+      check_missing_values(df),
+      "PASS: No missing values in the checked columns"
     )
   }
 )
 
 
-# Test 10: Warning message is returned 
+# Test 10: WARNING message is returned
 
 testthat::test_that(
-  "check_missing_values reports missing values",
+  "check_missing_values reports when missing values are found",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
     testthat::expect_message(
-      check_missing_values(
-        df = df,
-        metadata = metadata
-      ),
-      "WARNING: Found 1 row"
+      check_missing_values(df),
+      "WARNING: Found 3 row"
     )
   }
 )
 
 
-# Test 11: Non-data-frame df is rejected 
+# Test 11: Warning identifies affected columns
 
 testthat::test_that(
-  "check_missing_values rejects non-data-frame df",
+  "check_missing_values reports affected columns",
   {
     
-    metadata <- create_test_missing_values_metadata()
+    df <- create_test_missing_values_data()
+    
+    testthat::expect_message(
+      check_missing_values(df),
+      "Affected column\\(s\\): time_period_type, combination_id, source_code"
+    )
+  }
+)
+
+
+# Test 12: Returned rows retain original columns
+
+testthat::test_that(
+  "check_missing_values retains original columns and adds missing_columns",
+  {
+    
+    df <- create_test_missing_values_data()
+    
+    suppressMessages(
+      result <- check_missing_values(df)
+    )
+    
+    testthat::expect_equal(
+      names(result),
+      c(
+        names(df),
+        "missing_columns"
+      )
+    )
+  }
+)
+
+
+# Test 13: Non-data-frame input is rejected
+
+testthat::test_that(
+  "check_missing_values rejects non-data-frame input",
+  {
     
     testthat::expect_error(
       check_missing_values(
-        df = c(1, 2, 3),
-        metadata = metadata
+        c(1, 2, 3)
       ),
       "`df` must be a data frame"
     )
@@ -286,131 +374,61 @@ testthat::test_that(
 )
 
 
-# Test 12: Non-data-frame metadata is rejected 
+# Test 14: cols must be a character vector
 
 testthat::test_that(
-  "check_missing_values rejects non-data-frame metadata",
+  "check_missing_values rejects non-character cols",
   {
     
     df <- create_test_missing_values_data()
     
     testthat::expect_error(
       check_missing_values(
-        df = df,
-        metadata = c(1, 2, 3)
+        df,
+        cols = c(1, 2)
       ),
-      "`metadata` must be a data frame"
+      "`cols` must be a character vector containing at least one column name"
     )
   }
 )
 
 
-# Test 13: Missing metadata columns are reported 
+# Test 15: cols cannot be empty
 
 testthat::test_that(
-  "check_missing_values reports missing metadata columns",
+  "check_missing_values rejects empty cols",
   {
     
     df <- create_test_missing_values_data()
     
-    metadata <- create_test_missing_values_metadata() |>
-      dplyr::select(
-        -precalculated
-      )
-    
     testthat::expect_error(
       check_missing_values(
-        df = df,
-        metadata = metadata
+        df,
+        cols = character(0)
       ),
-      "Missing required metadata columns: precalculated"
+      "`cols` must be a character vector containing at least one column name"
     )
   }
 )
 
 
-# Test 14: Missing indicator_id in df is reported 
+# Test 16: Requested columns must exist
 
 testthat::test_that(
-  "check_missing_values requires indicator_id in df",
-  {
-    
-    df <- create_test_missing_values_data() |>
-      dplyr::select(
-        -indicator_id
-      )
-    
-    metadata <- create_test_missing_values_metadata()
-    
-    testthat::expect_error(
-      check_missing_values(
-        df = df,
-        metadata = metadata
-      ),
-      "Missing required column: indicator_id"
-    )
-  }
-)
-
-
-# Test 15: Requested columns must exist 
-
-testthat::test_that(
-  "check_missing_values rejects requested columns that do not exist",
+  "check_missing_values rejects columns that do not exist",
   {
     
     df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
     
     testthat::expect_error(
       check_missing_values(
-        df = df,
-        metadata = metadata,
+        df,
         cols = c(
           "source_code",
           "missing_column"
         )
       ),
       "Columns not found in `df`: missing_column"
-    )
-  }
-)
-
-
-# Test 16: show_n must be valid 
-
-testthat::test_that(
-  "check_missing_values validates show_n",
-  {
-    
-    df <- create_test_missing_values_data()
-    metadata <- create_test_missing_values_metadata()
-    
-    testthat::expect_error(
-      check_missing_values(
-        df = df,
-        metadata = metadata,
-        show_n = 0
-      ),
-      "`show_n` must be a whole number greater than or equal to 1"
-    )
-    
-    testthat::expect_error(
-      check_missing_values(
-        df = df,
-        metadata = metadata,
-        show_n = 2.5
-      ),
-      "`show_n` must be a whole number greater than or equal to 1"
-    )
-    
-    testthat::expect_error(
-      check_missing_values(
-        df = df,
-        metadata = metadata,
-        show_n = NA
-      ),
-      "`show_n` must be a whole number greater than or equal to 1"
     )
   }
 )
