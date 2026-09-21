@@ -6,40 +6,26 @@
 \usage{
 check_missing_values(
   df,
-  metadata,
-  cols = NULL,
-  ignore = c("numerator", "denominator", "lower_ci95", "upper_ci95"),
-  status_codes = c(1L, 2L),
-  show_n = 10L
+  cols = c("indicator_id", "start_date", "end_date", "time_period_type",
+    "combination_id", "source_code")
 )
 }
 \arguments{
-\item{df}{A data frame containing indicator data to check.}
+\item{df}{A data frame containing the data to check.}
 
-\item{metadata}{A data frame containing indicator metadata, including
-\code{indicator_id}, \code{status_code}, and \code{precalculated}.}
-
-\item{cols}{Optional character vector of columns to check. If \code{NULL}, all
-columns are checked except those listed in \code{ignore}.}
-
-\item{ignore}{Character vector of columns to exclude from the check.
-Defaults to \code{numerator}, \code{denominator}, \code{lower_ci95}, and \code{upper_ci95}.}
-
-\item{status_codes}{Integer vector of indicator status codes to include.
-Defaults to \code{c(1L, 2L)}, representing current and no-longer-refreshed
-indicators.}
-
-\item{show_n}{Maximum number of summary rows to print. Defaults to \code{10L}.}
+\item{cols}{Character vector of column names to check. Defaults to
+\code{indicator_id}, \code{start_date}, \code{end_date}, \code{time_period_type},
+\code{combination_id}, and \code{source_code}.}
 }
 \value{
-A data frame containing rows with missing values in the checked
-columns. Returns an empty data frame if no missing values are found.
+A data frame containing rows with missing values and an additional
+\code{missing_columns} column showing which fields are missing.
+Returns an empty data frame if no issues are found.
 }
 \description{
-Checks selected columns for missing values for non-precalculated indicators
-with the specified status codes.
+Checks selected columns for missing or blank values.
 }
 \details{
-Only indicators where \code{precalculated == "No"} and \code{status_code} matches one
-of \code{status_codes} are included in the check.
+Character columns are treated as missing if they contain \code{NA}, an empty
+string, or only whitespace.
 }
