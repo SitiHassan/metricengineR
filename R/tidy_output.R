@@ -70,7 +70,7 @@
 #' @export
 tidy_output <- function(data) {
   
-  if (!is.data.frame(data)) {
+  if(!is.data.frame(data)){
     stop(
       "`data` must be a data frame.",
       call. = FALSE
@@ -100,39 +100,86 @@ tidy_output <- function(data) {
   
   out <- data
   
-  if (!"indicator_value" %in% names(out)) {
+  
+  # Standardise indicator value
+  
+  if(!"indicator_value" %in% names(out)){
     
-    if ("value" %in% names(out)) {
+    if("value" %in% names(out)){
+      
       out$indicator_value <- out$value
+      
     } else {
-      out$indicator_value <- NA_real_
+      
+      out$indicator_value <- rep(
+        NA_real_,
+        nrow(out)
+      )
     }
   }
   
-  if (!"lower_ci95" %in% names(out)) {
+  
+  # Standardise lower confidence interval
+  
+  if(!"lower_ci95" %in% names(out)){
     
-    if ("lowercl" %in% names(out)) {
+    if("lowercl" %in% names(out)){
+      
       out$lower_ci95 <- out$lowercl
+      
     } else {
-      out$lower_ci95 <- NA_real_
+      
+      out$lower_ci95 <- rep(
+        NA_real_,
+        nrow(out)
+      )
     }
   }
   
-  if (!"upper_ci95" %in% names(out)) {
+  
+  # Standardise upper confidence interval
+  
+  if(!"upper_ci95" %in% names(out)){
     
-    if ("uppercl" %in% names(out)) {
+    if("uppercl" %in% names(out)){
+      
       out$upper_ci95 <- out$uppercl
+      
     } else {
-      out$upper_ci95 <- NA_real_
+      
+      out$upper_ci95 <- rep(
+        NA_real_,
+        nrow(out)
+      )
     }
   }
+  
+  
+  # Identify missing standard columns
   
   missing_cols <- setdiff(
     TIDY_COLS,
     names(out)
   )
   
-  out[missing_cols] <- NA
+  
+  # Add missing columns
+  
+  if(length(missing_cols) > 0L){
+    
+    out[missing_cols] <- lapply(
+      missing_cols,
+      function(x){
+        rep(
+          NA,
+          nrow(out)
+        )
+      }
+    )
+  }
+  
+  
+  # Return standard output structure
   
   out |>
     dplyr::select(
