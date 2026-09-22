@@ -208,3 +208,42 @@ test_that("tidy_output rejects input that is not a data frame", {
     "`data` must be a data frame"
   )
 })
+
+testthat::test_that("tidy_output handles an empty data frame", {
+  
+  df <- data.frame(
+    indicator_id = integer(),
+    start_date = as.Date(character())
+  )
+  
+  result <- tidy_output(df)
+  
+  testthat::expect_equal(
+    nrow(result),
+    0L
+  )
+  
+  testthat::expect_equal(
+    names(result),
+    c(
+      "indicator_id",
+      "start_date",
+      "end_date",
+      "numerator",
+      "denominator",
+      "indicator_value",
+      "lower_ci95",
+      "upper_ci95",
+      "imd_code",
+      "aggregation_id",
+      "age_group_code",
+      "sex_code",
+      "ethnicity_code",
+      "creation_date",
+      "value_type_code",
+      "source_code",
+      "time_period_type",
+      "combination_id"
+    )
+  )
+})
