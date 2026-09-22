@@ -12,9 +12,11 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.1.0)
 Imports: 
+    cvdprevent,
     DBI,
     dplyr,
     httr,
+    janitor,
     lubridate,
     PHEindicatormethods,
     purrr,
@@ -22,6 +24,7 @@ Imports:
     rlang,
     stats,
     stringr,
+    tibble,
     tidyr,
     utils
 Suggests: 
