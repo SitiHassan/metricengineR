@@ -13,6 +13,9 @@ utils::globalVariables(
     "denominator_rate",
     "numerator_dasr",
     "denominator_dasr",
-    "std_pop"
+    "std_pop",
+    "period_year",
+    "from",
+    "to"
   )
 )
