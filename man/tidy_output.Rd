@@ -26,16 +26,17 @@ alternative calculation output column names to the metric engine schema.
 The following alternative column names are handled:
 
 \itemize{
-\item \code{value} is used to populate \code{indicator_value} when
-\code{indicator_value} is not already present.
-\item \code{lowercl} is used to populate \code{lower_ci95} when
-\code{lower_ci95} is not already present.
-\item \code{uppercl} is used to populate \code{upper_ci95} when
-\code{upper_ci95} is not already present.
+\item \code{value} is used to populate missing values in \code{indicator_value}.
+\item \code{lowercl} is used to populate missing values in \code{lower_ci95}.
+\item \code{uppercl} is used to populate missing values in \code{upper_ci95}.
 }
 
-If both the standard column and its alternative column are present, the
-existing standard column is retained.
+If the standard column does not exist, it is created from the corresponding
+alternative column where available.
+
+If both the standard column and its alternative column are present,
+existing non-missing values in the standard column are retained, while
+missing values are populated from the corresponding alternative column.
 
 Any standard output columns that are not present in the input data are
 created and populated with \code{NA}.
