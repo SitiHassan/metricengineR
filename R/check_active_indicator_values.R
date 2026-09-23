@@ -114,7 +114,7 @@ check_active_indicator_values <- function(df, metadata) {
   if(nrow(failures) == 0L){
     
     message(
-      "\u2705 PASS: All active indicators have a populated indicator_value, ",
+      "PASS: All active indicators have a populated indicator_value, ",
       "excluding expected missing values."
     )
     
@@ -129,7 +129,7 @@ check_active_indicator_values <- function(df, metadata) {
       )
     
     message(
-      "\u26A0\uFE0F WARNING: Found active indicators with unexpected missing ",
+      "WARNING: Found active indicators with unexpected missing ",
       "indicator_value for indicator ID(s): ",
       paste(failed_ids, collapse = ", ")
     )

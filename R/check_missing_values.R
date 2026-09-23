@@ -116,7 +116,7 @@ check_missing_values <- function(
   if(nrow(missing_rows) == 0L){
     
     message(
-      "\u2705 PASS: No missing values in the checked columns."
+      " PASS: No missing values in the checked columns."
     )
     
   } else {
@@ -126,7 +126,7 @@ check_missing_values <- function(
     ]
     
     message(
-      "\u26A0\uFE0F WARNING: Found ",
+      " WARNING: Found ",
       nrow(missing_rows),
       " row(s) with missing values. ",
       "Affected column(s): ",

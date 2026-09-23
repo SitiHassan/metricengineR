@@ -315,7 +315,7 @@ get_cvd_indicators <- function(
   
   
   message(
-    "\u2705 CVDPREVENT extraction completed."
+    " CVDPREVENT extraction completed."
   )
   
   

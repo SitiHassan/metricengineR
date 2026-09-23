@@ -162,7 +162,7 @@ replace_indicator_data_in_sql <- function(conn,
       if (is.null(ids) || length(ids) == 0) { # All rows are deleted when "All" is supplied (normalised "All" will be NULL)
         
         message(
-          "\u2705 All rows deleted and new data appended to ",
+          "PASS: All rows deleted and new data appended to ",
           tbl_sql,
           "."
         )
@@ -170,7 +170,7 @@ replace_indicator_data_in_sql <- function(conn,
       } else {
         
         message(
-          "\u2705 Deleted and replaced data for selected indicator_ids in ",
+          "Deleted and replaced data for selected indicator_ids in ",
           tbl_sql,
           "."
         )
@@ -178,7 +178,7 @@ replace_indicator_data_in_sql <- function(conn,
     },
     error = function(e) {
       stop(
-        "\u274C Failed to insert data into SQL table ",
+        "FAIL: Failed to insert data into SQL table ",
         table_name,
         " - ",
         conditionMessage(e),

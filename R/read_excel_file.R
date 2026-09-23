@@ -72,14 +72,14 @@ read_excel_file <- function(
       ) |>
         dplyr::mutate(source_file = file_name)
       
-      message("Excel file processed: ", file_name,  "\u2705 ")
+      message("PASS: Excel file processed: ", file_name,  " ")
       
       df
     },
     error = function(e) {
       
       warning(
-        "Could not process ", file_name,
+        "WARNING: Could not process ", file_name,
         ": ", conditionMessage(e)
       )
       

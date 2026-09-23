@@ -50,7 +50,7 @@ check_row_counts <- function(
   if(row_counts_match){
     
     message(
-      "\u2705 PASS: Row counts match: ",
+      " PASS: Row counts match: ",
       input_rows,
       " rows."
     )
@@ -58,7 +58,7 @@ check_row_counts <- function(
   } else {
     
     message(
-      "\u26A0\uFE0F WARNING: Row counts do not match. ",
+      " WARNING: Row counts do not match. ",
       "Input: ", input_rows,
       " rows | Reference: ", reference_rows,
       " rows | Difference: ", row_difference,

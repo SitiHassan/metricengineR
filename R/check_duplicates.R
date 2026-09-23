@@ -97,7 +97,7 @@ check_duplicates <- function(
   if(nrow(result) > 0L){
     
     message(
-      "\u274C FAIL: Duplicate records found: ",
+      " FAIL: Duplicate records found: ",
       nrow(result),
       " duplicated key combination(s)."
     )
@@ -105,7 +105,7 @@ check_duplicates <- function(
   } else {
     
     message(
-      "\u2705 PASS: No duplicate records found for the specified key columns."
+      " PASS: No duplicate records found for the specified key columns."
     )
   }
   

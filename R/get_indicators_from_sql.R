@@ -132,7 +132,7 @@ get_indicators_from_sql <- function(conn,
       # Run the query
       result <- DBI::dbGetQuery(conn, sql_query)
       
-      message("\u2705 Indicators successfully extracted from SQL.")
+      message("PASS: Indicators successfully extracted from SQL.")
       
       message("Total rows extracted: ",nrow(result))
       
@@ -140,7 +140,7 @@ get_indicators_from_sql <- function(conn,
     },
     error = function(e) {
       stop(
-        "\u274C Failed to extract indicators from SQL table ",
+        "FAIL: Failed to extract indicators from SQL table ",
         table_name,
         " - ",
         conditionMessage(e),
