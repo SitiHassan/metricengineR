@@ -103,7 +103,7 @@ get_fingertips_indicators <- function(
         )
         
         message(
-          "\u2705 Successfully retrieved indicator: ",
+          "PASS Successfully retrieved indicator: ",
           id
         )
         
@@ -113,7 +113,7 @@ get_fingertips_indicators <- function(
       error = function(e){
         
         message(
-          "\u26A0\uFE0F Could not retrieve indicator ",
+          "FAIL: Could not retrieve indicator ",
           id,
           ": ",
           conditionMessage(e)

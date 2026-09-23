@@ -71,7 +71,7 @@ check_invalid_percentages <- function(df) {
       )
     
     message(
-      "\u26A0\uFE0F WARNING: Found percentage values greater than 100 for ",
+      " WARNING: Found percentage values greater than 100 for ",
       "indicator ID(s): ",
       paste(sort(failed_indicators), collapse = ", "),
       ". This may be valid for metrics comparing actual performance against ",
@@ -83,7 +83,7 @@ check_invalid_percentages <- function(df) {
   } else {
     
     message(
-      "\u2705 PASS: No percentage values greater than 100 were found."
+      " PASS: No percentage values greater than 100 were found."
     )
   }
   

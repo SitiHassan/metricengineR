@@ -83,13 +83,13 @@ check_source_code <- function(
   if(nrow(results) == 0L){
     
     message(
-      "\u2705 PASS: Every indicator has exactly one source code."
+      " PASS: Every indicator has exactly one source code."
     )
     
   } else {
     
     message(
-      "\u26A0\uFE0F WARNING: ",
+      " WARNING: ",
       nrow(results),
       " indicator(s) have more than one source code."
     )

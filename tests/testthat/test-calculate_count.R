@@ -170,3 +170,50 @@ testthat::test_that("calculate_count stops when confidence intervals are require
     "Confidence intervals for counts have not yet been implemented."
   )
 })
+
+# Test 9: Missing indicator value is overridden by value column
+testthat::test_that(
+  "tidy_output fills missing indicator_value from value",
+  {
+    
+    df <- data.frame(
+      indicator_id = c(1L, 2L, 3L),
+      indicator_value = c(NA, 20, NA),
+      value = c(10, 25, 30)
+    )
+    
+    result <- tidy_output(df)
+    
+    testthat::expect_equal(
+      result$indicator_value,
+      c(10, 20, 30)
+    )
+  }
+)
+
+# Tes 10: Missing confidence intervals are overridden by alternative columns
+testthat::test_that(
+  "tidy_output fills missing confidence intervals from alternative columns",
+  {
+    
+    df <- data.frame(
+      indicator_id = 1L,
+      lower_ci95 = NA_real_,
+      upper_ci95 = NA_real_,
+      lowercl = 12.5,
+      uppercl = 18.7
+    )
+    
+    result <- tidy_output(df)
+    
+    testthat::expect_equal(
+      result$lower_ci95,
+      12.5
+    )
+    
+    testthat::expect_equal(
+      result$upper_ci95,
+      18.7
+    )
+  }
+)

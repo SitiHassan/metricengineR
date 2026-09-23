@@ -50,11 +50,11 @@ run_sql_file <- function(conn, path) {
       
       DBI::dbExecute(conn, sql_text)
       
-      message("\u2705 SQL script successfully run: ", basename(path))
+      message("PASS: SQL script successfully run: ", basename(path))
     },
     error = function(e){
       stop(
-        "\u274C SQL script failed: ", basename(path), " - ", conditionMessage(e), call. = FALSE
+        "FAIL: SQL script failed: ", basename(path), " - ", conditionMessage(e), call. = FALSE
       )
     }
   )

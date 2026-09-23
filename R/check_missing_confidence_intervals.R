@@ -64,7 +64,7 @@ check_missing_confidence_intervals <- function(df) {
   if(nrow(missing_ci_rows) == 0L){
     
     message(
-      "\u2705 PASS: No missing confidence intervals."
+      " PASS: No missing confidence intervals."
     )
     
   } else {
@@ -78,7 +78,7 @@ check_missing_confidence_intervals <- function(df) {
       )
     
     message(
-      "\u26A0\uFE0F WARNING: Some rows have missing confidence intervals. ",
+      " WARNING: Some rows have missing confidence intervals. ",
       "This may be acceptable for value types where confidence intervals ",
       "are not expected. Indicator ID(s): ",
       paste(sort(failed_ids), collapse = ", ")

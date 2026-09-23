@@ -17,16 +17,17 @@
 #' The following alternative column names are handled:
 #'
 #' \itemize{
-#'   \item `value` is used to populate `indicator_value` when
-#'     `indicator_value` is not already present.
-#'   \item `lowercl` is used to populate `lower_ci95` when
-#'     `lower_ci95` is not already present.
-#'   \item `uppercl` is used to populate `upper_ci95` when
-#'     `upper_ci95` is not already present.
+#'   \item `value` is used to populate missing values in `indicator_value`.
+#'   \item `lowercl` is used to populate missing values in `lower_ci95`.
+#'   \item `uppercl` is used to populate missing values in `upper_ci95`.
 #' }
 #'
-#' If both the standard column and its alternative column are present, the
-#' existing standard column is retained.
+#' If the standard column does not exist, it is created from the corresponding
+#' alternative column where available.
+#'
+#' If both the standard column and its alternative column are present,
+#' existing non-missing values in the standard column are retained, while
+#' missing values are populated from the corresponding alternative column.
 #'
 #' Any standard output columns that are not present in the input data are
 #' created and populated with `NA`.
@@ -77,6 +78,9 @@ tidy_output <- function(data) {
     )
   }
   
+  
+  # Standard output columns
+  
   TIDY_COLS <- c(
     "indicator_id",
     "start_date",
@@ -98,60 +102,82 @@ tidy_output <- function(data) {
     "combination_id"
   )
   
+  
   out <- data
   
   
   # Standardise indicator value
   
-  if(!"indicator_value" %in% names(out)){
+  if("value" %in% names(out)){
     
-    if("value" %in% names(out)){
+    if("indicator_value" %in% names(out)){
       
-      out$indicator_value <- out$value
+      out$indicator_value <- dplyr::coalesce(
+        out$indicator_value,
+        out$value
+      )
       
     } else {
       
-      out$indicator_value <- rep(
-        NA_real_,
-        nrow(out)
-      )
+      out$indicator_value <- out$value
     }
+    
+  } else if(!"indicator_value" %in% names(out)){
+    
+    out$indicator_value <- rep(
+      NA_real_,
+      nrow(out)
+    )
   }
   
   
   # Standardise lower confidence interval
   
-  if(!"lower_ci95" %in% names(out)){
+  if("lowercl" %in% names(out)){
     
-    if("lowercl" %in% names(out)){
+    if("lower_ci95" %in% names(out)){
       
-      out$lower_ci95 <- out$lowercl
+      out$lower_ci95 <- dplyr::coalesce(
+        out$lower_ci95,
+        out$lowercl
+      )
       
     } else {
       
-      out$lower_ci95 <- rep(
-        NA_real_,
-        nrow(out)
-      )
+      out$lower_ci95 <- out$lowercl
     }
+    
+  } else if(!"lower_ci95" %in% names(out)){
+    
+    out$lower_ci95 <- rep(
+      NA_real_,
+      nrow(out)
+    )
   }
   
   
   # Standardise upper confidence interval
   
-  if(!"upper_ci95" %in% names(out)){
+  if("uppercl" %in% names(out)){
     
-    if("uppercl" %in% names(out)){
+    if("upper_ci95" %in% names(out)){
       
-      out$upper_ci95 <- out$uppercl
+      out$upper_ci95 <- dplyr::coalesce(
+        out$upper_ci95,
+        out$uppercl
+      )
       
     } else {
       
-      out$upper_ci95 <- rep(
-        NA_real_,
-        nrow(out)
-      )
+      out$upper_ci95 <- out$uppercl
     }
+    
+  } else if(!"upper_ci95" %in% names(out)){
+    
+    out$upper_ci95 <- rep(
+      NA_real_,
+      nrow(out)
+    )
   }
   
   
@@ -163,7 +189,7 @@ tidy_output <- function(data) {
   )
   
   
-  # Add missing columns
+  # Add missing standard columns
   
   if(length(missing_cols) > 0L){
     
